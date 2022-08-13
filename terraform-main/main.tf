@@ -29,12 +29,30 @@ resource "docker_image" "kibana" {
 
 resource "docker_image" "dsiem-filebeat-suricata" {
   name = "gianzav/dfs:latest"
+  #  build {
+  #    path = "../docker_images/dsiem_filebeat_suricata/"
+  #    tag = ["dfs:latest"]
+  #  }
 }
 
 resource "docker_image" "filebeat-es" {
   name = "gianzav/filebeat-es:latest"
 }
 
+resource "docker_image" "ubuntu" {
+  name = "ubuntu"
+}
+
+resource "docker_container" "client" {
+  image = docker_image.ubuntu.latest
+  name  = "client"
+  networks_advanced {
+    name = "siemnet"
+  }
+  hostname = "client"
+  init     = true
+  command  = ["sleep", "1h"]
+}
 
 resource "docker_container" "elasticsearch" {
   image = docker_image.elasticsearch.latest
@@ -55,7 +73,7 @@ resource "docker_container" "elasticsearch" {
     "xpack.graph.enabled=false",
     "xpack.watcher.enabled=false",
     "http.cors.enabled=true",
-  "http.cors.allow-origin='/https?://localsiemnet(:[0-9]+)?/'"]
+  "http.cors.allow-origin='/https?://localhost(:[0-9]+)?/'"]
   volumes {
     container_path = "/usr/share/elasticsearch/data"
     volume_name    = "es-data"
@@ -63,7 +81,6 @@ resource "docker_container" "elasticsearch" {
 }
 
 
-# <TODO>: adapt logstash config and templates to latest version
 resource "docker_container" "logstash" {
   image = docker_image.logstash.latest
   name  = "logstash"
