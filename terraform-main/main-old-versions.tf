@@ -12,6 +12,11 @@ provider "docker" {}
 
 resource "docker_network" "siem_network" {
   name = "siemnet"
+  driver = "bridge"
+  ipam_config {
+    subnet = "192.168.80.0/20"
+    gateway = "192.168.80.1"
+  }
 }
 
 
@@ -48,6 +53,7 @@ resource "docker_container" "client" {
   name  = "client"
   networks_advanced {
     name = "siemnet"
+    ipv4_address = "192.168.80.2"
   }
   hostname = "client"
   init     = true
@@ -59,6 +65,7 @@ resource "docker_container" "elasticsearch" {
   name  = "elasticsearch"
   networks_advanced {
     name = "siemnet"
+    ipv4_address = "192.168.80.3"
   }
   hostname = "elasticsearch"
   ports {
@@ -88,6 +95,7 @@ resource "docker_container" "logstash" {
   name  = "logstash"
   networks_advanced {
     name = "siemnet"
+    ipv4_address = "192.168.80.4"
   }
   hostname = "logstash"
   ports {
@@ -103,6 +111,7 @@ resource "docker_container" "kibana" {
   name  = "kibana"
   networks_advanced {
     name = "siemnet"
+    ipv4_address = "192.168.80.5"
   }
   hostname = "kibana"
   ports {
@@ -119,6 +128,7 @@ resource "docker_container" "dsiem-filebeat-suricata" {
 
   networks_advanced {
     name = "siemnet"
+    ipv4_address = "192.168.80.6"
   }
   hostname = "dsiem"
   ports {
@@ -139,6 +149,10 @@ resource "docker_container" "dsiem-filebeat-suricata" {
     container_path = "/usr/share/filebeat/data"
     volume_name    = "filebeat-data"
   }
+  volumes {
+    container_path = "/var/dsiem/configs/dsiem_directives.json"
+    host_path = "/home/gz/repos/Tesi/terraform-main/dsiem_directives/dsiem_directives.json"
+  }
 }
 
 
@@ -148,6 +162,7 @@ resource "docker_container" "filebeat-es" {
   user  = "root"
   networks_advanced {
     name = "siemnet"
+    ipv4_address = "192.168.80.7"
   }
   hostname = "filebeat-es"
   volumes {
