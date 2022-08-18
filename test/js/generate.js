@@ -5,7 +5,7 @@ const tosca = require('tosca.lib.utils');
 traversal.coerce();
 
 let tf = '';
-
+writeProvider();
 for (let id in clout.vertexes) {
 	let vertex = clout.vertexes[id];
 
@@ -31,6 +31,9 @@ function getTerraform(vertex) {
         }
     }
     return terraform;
+}
+function writeProvider(){
+    tf += 'terraform {\nrequired_providers {\ndocker = {\nsource  = "kreuzwerker/docker"\nversion = "~> 2.13.0"\n}\n}\n}\n\nprovider "docker" {}\n\n';
 }
 
 puccini.write(tf);
