@@ -7,8 +7,13 @@ terraform {
   }
 }
 
-provider "docker" {}
 
+# convenience variables
+locals {
+   terraform_dir = "/home/gz/repos/Tesi/terraform-main"
+}
+
+provider "docker" {}
 
 resource "docker_network" "siem_network" {
   name = "siemnet"
@@ -72,6 +77,17 @@ resource "docker_container" "elasticsearch" {
     internal = 9200
     external = 9200
   }
+#  env = ["discovery.type=single-node",
+#    "ES_JAVA_OPTS=-Xms256m -Xmx256m",
+#    "cluster.routing.allocation.disk.threshold_enabled=false",
+#    "xpack.security.enabled=false",
+#    "xpack.monitoring.enabled=false",
+#    "xpack.ml.enabled=false",
+#    "xpack.graph.enabled=false",
+#    "xpack.watcher.enabled=false",
+#    "http.cors.enabled=true",
+#  "http.cors.allow-origin='/https?://localhost(:[0-9]+)?/'"]
+
   env = ["discovery.type=single-node",
     "ES_JAVA_OPTS=-Xms256m -Xmx256m",
     "cluster.routing.allocation.disk.threshold_enabled=false",
@@ -81,7 +97,9 @@ resource "docker_container" "elasticsearch" {
     "xpack.graph.enabled=false",
     "xpack.watcher.enabled=false",
     "http.cors.enabled=true",
-  "http.cors.allow-origin='/https?://localhost(:[0-9]+)?/'"]
+    "http.cors.allow-origin=*",
+    "http.cors.allow-headers: Authorization,X-Requested-With,Content-Type,Content-Length"
+   ]
   volumes {
     container_path = "/usr/share/elasticsearch/data"
     volume_name    = "es-data"
@@ -103,6 +121,10 @@ resource "docker_container" "logstash" {
     external = 5400
   }
   env = ["XPACK_MONITORING_ENABLED=false"]
+  volumes {
+     container_path = "/usr/share/logstash/pipeline/70_siem-plugin-suricata.conf"
+     host_path = format("%s/%s", local.terraform_dir, "pipeline/70_siem-plugin-suricata.conf")  
+  }
 }
 
 
@@ -150,9 +172,22 @@ resource "docker_container" "dsiem-filebeat-suricata" {
     volume_name    = "filebeat-data"
   }
   volumes {
-    container_path = "/var/dsiem/configs/dsiem_directives.json"
-    host_path = "/home/gz/repos/Tesi/terraform-main/dsiem_directives/dsiem_directives.json"
+    container_path = "/dsiem/configs/directives_dsiem.json"
+    host_path = "/home/gz/repos/Tesi/terraform-main/dsiem_directives/directives_dsiem.json"
   }
+  volumes {
+    container_path = "/var/lib/suricata/rules/"
+    host_path = format("%s/%s",local.terraform_dir, "suricata_rules/")
+  }
+  volumes {
+    container_path = "/var/dsiem/web/dist/assets/config/esconfig.json"
+    host_path = format("%s/%s", local.terraform_dir, "esconfig.json")
+  }
+  volumes {
+    container_path = "/var/dsiem/dpluger_suricata.json"
+    host_path = format("%s/%s", local.terraform_dir, "dpluger_suricata.json")
+  }
+  command = ["/bin/bash", "-c", "service suricata start && service filebeat start && /var/dsiem/dsiem serve --debug"]
 }
 
 
