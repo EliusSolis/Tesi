@@ -1,0 +1,51 @@
+filebeat.inputs:
+    - type: filestream
+      id: siem-alarm-events
+      paths:
+          - /var/log/dsiem/siem_alarm_events.json
+      fields_under_root: true
+      fields: { application: "siem", siem_data_type: "alarm_events" }
+      tail_files: true
+      parsers:
+          - ndjson:
+              # json.keys_under_root: true
+              overwrite_keys: true
+
+    - type: filestream
+      id: siem-alarms
+      paths:
+        - /var/log/dsiem/siem_alarms.json
+      fields_under_root: true
+      fields: { application: "siem", siem_data_type: "alarms" }
+      tail_files: true
+      parsers:
+          - ndjson:
+              # json.keys_under_root: true
+              overwrite_keys: true
+
+    - type: filestream
+      id: dtester
+      paths:
+        - /var/log/dsiem/dtester.json
+      fields_under_root: true
+      fields: { application: "dtester" }
+      tail_files: true
+      parsers:
+          - ndjson:
+              # json.keys_under_root: true
+              overwrite_keys: true
+
+    - type: filestream
+      id: suricata
+      paths:
+        - "/var/log/suricata/eve.json"
+      fields_under_root: true
+      fields: { application: "suricata" }
+      json.message_key: log
+      parsers:
+          - ndjson:
+              # json.keys_under_root: true
+              overwrite_keys: true
+
+output.logstash:
+   hosts: ["logstash:5001"]

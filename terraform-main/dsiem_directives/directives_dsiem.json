@@ -1,0 +1,438 @@
+{
+  "directives": [
+    {
+      "id": 100000,
+      "name": "http traffic (SRC_IP to DST_IP)",
+      "priority": 3,
+      "disabled": false,
+      "all_rules_always_active": false,
+      "kingdom": "Environmental Awareness",
+      "category": "",
+      "rules": [
+        {
+          "name": "http traffic",
+          "stage": 1,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000000
+          ],
+          "occurrence": 1,
+          "from": "ANY",
+          "to": "ANY",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 1,
+          "timeout": 0
+        },
+        {
+          "name": "http traffic",
+          "stage": 2,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000000
+          ],
+          "occurrence": 10,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 5,
+          "timeout": 3600
+        },
+        {
+          "name": "http traffic",
+          "stage": 3,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000000
+          ],
+          "occurrence": 10000,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 10,
+          "timeout": 21600
+        }
+      ]
+    },
+    {
+      "id": 100001,
+      "name": "icmp traffic (SRC_IP to DST_IP)",
+      "priority": 3,
+      "disabled": false,
+      "all_rules_always_active": false,
+      "kingdom": "Environmental Awareness",
+      "category": "",
+      "rules": [
+        {
+          "name": "icmp traffic",
+          "stage": 1,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000001
+          ],
+          "occurrence": 1,
+          "from": "ANY",
+          "to": "ANY",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 1,
+          "timeout": 0
+        },
+        {
+          "name": "icmp traffic",
+          "stage": 2,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000001
+          ],
+          "occurrence": 10,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 5,
+          "timeout": 3600
+        },
+        {
+          "name": "icmp traffic",
+          "stage": 3,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000001
+          ],
+          "occurrence": 10000,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 10,
+          "timeout": 21600
+        }
+      ]
+    },
+    {
+      "id": 100002,
+      "name": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management (SRC_IP to DST_IP)",
+      "priority": 3,
+      "disabled": false,
+      "all_rules_always_active": false,
+      "kingdom": "Environmental Awareness",
+      "category": "Not Suspicious Traffic",
+      "rules": [
+        {
+          "name": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
+          "stage": 1,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2013504
+          ],
+          "occurrence": 1,
+          "from": "ANY",
+          "to": "ANY",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 1,
+          "timeout": 0
+        },
+        {
+          "name": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
+          "stage": 2,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2013504
+          ],
+          "occurrence": 10,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 5,
+          "timeout": 3600
+        },
+        {
+          "name": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
+          "stage": 3,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2013504
+          ],
+          "occurrence": 10000,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 10,
+          "timeout": 21600
+        }
+      ]
+    },
+    {
+      "id": 100003,
+      "name": "GPL ICMP_INFO PING (SRC_IP to DST_IP)",
+      "priority": 3,
+      "disabled": false,
+      "all_rules_always_active": false,
+      "kingdom": "Environmental Awareness",
+      "category": "Misc activity",
+      "rules": [
+        {
+          "name": "GPL ICMP_INFO PING",
+          "stage": 1,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2100384
+          ],
+          "occurrence": 1,
+          "from": "ANY",
+          "to": "ANY",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 1,
+          "timeout": 0
+        },
+        {
+          "name": "GPL ICMP_INFO PING",
+          "stage": 2,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2100384
+          ],
+          "occurrence": 10,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 5,
+          "timeout": 3600
+        },
+        {
+          "name": "GPL ICMP_INFO PING",
+          "stage": 3,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2100384
+          ],
+          "occurrence": 10000,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 10,
+          "timeout": 21600
+        }
+      ]
+    },
+    {
+      "id": 100004,
+      "name": "SURICATA STREAM Packet with invalid timestamp (SRC_IP to DST_IP)",
+      "priority": 3,
+      "disabled": false,
+      "all_rules_always_active": false,
+      "kingdom": "Environmental Awareness",
+      "category": "Generic Protocol Command Decode",
+      "rules": [
+        {
+          "name": "SURICATA STREAM Packet with invalid timestamp",
+          "stage": 1,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2210044
+          ],
+          "occurrence": 1,
+          "from": "ANY",
+          "to": "ANY",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 1,
+          "timeout": 0
+        },
+        {
+          "name": "SURICATA STREAM Packet with invalid timestamp",
+          "stage": 2,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2210044
+          ],
+          "occurrence": 10,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 5,
+          "timeout": 3600
+        },
+        {
+          "name": "SURICATA STREAM Packet with invalid timestamp",
+          "stage": 3,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2210044
+          ],
+          "occurrence": 10000,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 10,
+          "timeout": 21600
+        }
+      ]
+    },
+    {
+      "id": 100005,
+      "name": "SURICATA HTTP unable to match response to request (SRC_IP to DST_IP)",
+      "priority": 3,
+      "disabled": false,
+      "all_rules_always_active": false,
+      "kingdom": "Environmental Awareness",
+      "category": "Generic Protocol Command Decode",
+      "rules": [
+        {
+          "name": "SURICATA HTTP unable to match response to request",
+          "stage": 1,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2221010
+          ],
+          "occurrence": 1,
+          "from": "ANY",
+          "to": "ANY",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 1,
+          "timeout": 0
+        },
+        {
+          "name": "SURICATA HTTP unable to match response to request",
+          "stage": 2,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2221010
+          ],
+          "occurrence": 10,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 5,
+          "timeout": 3600
+        },
+        {
+          "name": "SURICATA HTTP unable to match response to request",
+          "stage": 3,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2221010
+          ],
+          "occurrence": 10000,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 10,
+          "timeout": 21600
+        }
+      ]
+    },
+    {
+      "id": 100006,
+      "name": "SURICATA HTTP too many warnings (SRC_IP to DST_IP)",
+      "priority": 3,
+      "disabled": false,
+      "all_rules_always_active": false,
+      "kingdom": "Environmental Awareness",
+      "category": "Generic Protocol Command Decode",
+      "rules": [
+        {
+          "name": "SURICATA HTTP too many warnings",
+          "stage": 1,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2221050
+          ],
+          "occurrence": 1,
+          "from": "ANY",
+          "to": "ANY",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 1,
+          "timeout": 0
+        },
+        {
+          "name": "SURICATA HTTP too many warnings",
+          "stage": 2,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2221050
+          ],
+          "occurrence": 10,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 5,
+          "timeout": 3600
+        },
+        {
+          "name": "SURICATA HTTP too many warnings",
+          "stage": 3,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            2221050
+          ],
+          "occurrence": 10000,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 10,
+          "timeout": 21600
+        }
+      ]
+    }
+  ]
+}

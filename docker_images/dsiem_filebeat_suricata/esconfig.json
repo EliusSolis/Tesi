@@ -1,0 +1,4 @@
+{
+    "elasticsearch": "http://elasticsearch:9200",
+    "kibana": "http://kibana:5601"
+}
