@@ -1,0 +1,98 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+description: >
+  Base node type definition.
+
+metadata:
+  template_name: custom types
+
+node_types:
+
+  terraform_host:
+    description: general host node for terraform compability
+    derived_from: tosca.nodes.Root
+    properties:
+      name:
+        type: string
+        required: true
+      hostname:
+        type: string
+        required: false
+      image:
+        type: string # maybe declare new type like terraform_container or use tosca.artifacts.Deployment.Image
+        required: false
+      user:
+        type: string
+        required: false
+      networks_advanced:
+        type: terraform_network
+        required: false
+      ports:
+        type: terraform_network
+        required: false
+      init:
+        type: boolean
+        default: true
+        required: false
+      command:
+        type: list # should declare a tuple type?
+        required: false
+      env:
+        type: list
+        required: false
+      volumes:
+        type: tosca.nodes.Root
+        properties:
+          volume_name:
+            type: string
+            required: false
+          container_path:
+            type: string
+            required: true
+          host_path:
+            type: string
+            required: false
+        required: false
+  
+  terraform_network:
+    description: general network node for terraform compability
+    derived_from: tosca.nodes.Root
+    properties:
+      name:
+        type: string
+        required: true
+      driver:
+        type: string
+        default: "bridge"
+        required: false
+      ip_version:
+        type: string
+        default: 4
+        required: false
+      ipv4_address:
+        type: string
+        required: false
+      ipv6_address:
+        type: string
+        required: false
+      internal:
+        description: internal port key
+        type: string
+        default: 8080
+        required: false
+      external:
+        description: external port key
+        type: string
+        default: 8080
+        required: false
+    attributes:
+      ipam_config:
+        type: tosca.nodes.Root
+        properties:
+          subnet:
+            type: string
+            default: "192.168.80.0/20"
+          gateway:
+            type: string
+            default: "192.168.80.1"
+    
