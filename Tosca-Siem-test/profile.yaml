@@ -1,10 +1,13 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 
+namespace: terraform
+
 description: >
   Base node type definition.
 
 metadata:
   template_name: custom types
+  puccini.scriptlet.import:terraform.generate: js/generate.js
 
 
 data_types:
@@ -36,7 +39,7 @@ data_types:
         required: false
       container_path:
         type: string
-        required: true
+        required: false
       host_path:
         type: string
         required: false
