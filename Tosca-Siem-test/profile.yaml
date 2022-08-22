@@ -6,6 +6,43 @@ description: >
 metadata:
   template_name: custom types
 
+
+data_types:
+
+  container.datatypes.network:
+    derived_from: tosca.datatypes.Root
+    properties:
+      name:
+        type: string
+        required: true
+      aliases:
+        description: The network aliases of the container in the specific network
+        type: list
+        entry_schema:
+          type: string
+        required: false
+      ipv4_address:
+        type: string
+        required: false
+      ipv6_address:
+        type: string
+        required: false
+
+  container.datatypes.volume:
+    derived_from: tosca.datatypes.Root
+    properties:
+      volume_name:
+        type: string
+        required: false
+      container_path:
+        type: string
+        required: true
+      host_path:
+        type: string
+        required: false
+
+
+
 node_types:
 
   terraform_host:
@@ -25,34 +62,34 @@ node_types:
         type: string
         required: false
       networks_advanced:
-        type: terraform_network
+        type: container.datatypes.network
         required: false
       ports:
-        type: terraform_network
+        type: map
+        entry_schema:
+          description: "map internal Port : external port"
+          type: integer
         required: false
       init:
         type: boolean
         default: true
         required: false
       command:
-        type: list # should declare a tuple type?
+        type: list
+        entry_schema:
+          type: string
         required: false
       env:
-        type: list
+        type: map
+        entry_schema:
+          type: string
         required: false
       volumes:
-        type: tosca.nodes.Root
-        properties:
-          volume_name:
-            type: string
-            required: false
-          container_path:
-            type: string
-            required: true
-          host_path:
-            type: string
-            required: false
+        type: list
+        entry_schema:
+          type: container.datatypes.volume
         required: false
+
   
   terraform_network:
     description: general network node for terraform compability
@@ -66,33 +103,14 @@ node_types:
         default: "bridge"
         required: false
       ip_version:
-        type: string
+        type: integer
         default: 4
         required: false
-      ipv4_address:
-        type: string
-        required: false
-      ipv6_address:
-        type: string
-        required: false
-      internal:
-        description: internal port key
-        type: string
-        default: 8080
-        required: false
-      external:
-        description: external port key
-        type: string
-        default: 8080
-        required: false
     attributes:
-      ipam_config:
-        type: tosca.nodes.Root
-        properties:
-          subnet:
-            type: string
-            default: "192.168.80.0/20"
-          gateway:
-            type: string
-            default: "192.168.80.1"
-    
+      subnet:
+        type: string
+        default: "192.168.80.0/20"
+      gateway:
+        type: string
+        default: "192.168.80.1"
+
