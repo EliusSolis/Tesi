@@ -24,7 +24,9 @@ function getTerraform(vertex) {
     let terraform = {};
     if (tosca.isTosca(vertex, 'NodeTemplate')) {
         for (let name in vertex.properties.types) {
+
             let type = vertex.properties.types[name];
+            tf += JSON.stringify(name);+'\n'
             if (type.metadata) {
                 terraform.resource = type.metadata['terraform.resource'];
             }
