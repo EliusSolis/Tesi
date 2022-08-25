@@ -128,8 +128,6 @@ node_types:
     attributes:
       subnet:
         type: string
-        default: 192.168.80.0/20
       gateway:
         type: string
-        default: 192.168.80.1
 
