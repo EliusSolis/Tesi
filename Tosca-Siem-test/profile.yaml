@@ -30,6 +30,25 @@ data_types:
       ipv6_address:
         type: string
         required: false
+  
+  container.datatypes.port:
+    derived_from: tosca.datatypes.Root
+    properties:
+      internal:
+        type: string
+        required: true
+      external:
+        type: string
+        required: true
+      protocol:
+        type: string
+        required: false
+        default: tcp
+      ip:
+        description: ip that can access the port
+        type: string
+        required: false
+        default: 0.0.0.0
 
   container.datatypes.volume:
     derived_from: tosca.datatypes.Root
@@ -59,7 +78,7 @@ node_types:
         type: string
         required: false
       image:
-        type: string # maybe declare new type like terraform_container or use tosca.artifacts.Deployment.Image
+        type: string
         required: false
       user:
         type: string
@@ -68,10 +87,7 @@ node_types:
         type: container.datatypes.network
         required: false
       ports:
-        type: map
-        entry_schema:
-          description: "map internal Port : external port"
-          type: integer
+        type: container.datatypes.port
         required: false
       init:
         type: boolean
@@ -103,7 +119,7 @@ node_types:
         required: true
       driver:
         type: string
-        default: "bridge"
+        default: bridge
         required: false
       ip_version:
         type: integer
@@ -112,8 +128,8 @@ node_types:
     attributes:
       subnet:
         type: string
-        #default: "192.168.80.0/20"
+        default: 192.168.80.0/20
       gateway:
         type: string
-        #default: "192.168.80.1"
+        default: 192.168.80.1
 

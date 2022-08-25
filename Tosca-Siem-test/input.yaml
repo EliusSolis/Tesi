@@ -13,9 +13,9 @@ topology_template:
       properties:
         name : siemnet
         driver: bridge
-      #attributes:
-        #subnet: 192.168.80.0/20
-        #gateway: 192.168.80.1
+      attributes:
+        subnet: 192.168.80.0/20
+        gateway: 192.168.80.1
 
     client:
       type: tf:terraform_host
@@ -38,7 +38,9 @@ topology_template:
           name : siemnet
           ipv4_address : 192.168.80.3
         hostname: elasticsearch
-        ports: { 9200: 9200 }
+        ports:
+          internal: 9200
+          external: 9200
         env:
           "discovery.type": "single-node"
           "ES_JAVA_OPTS": "-Xms256m -Xmx256m"
@@ -64,7 +66,9 @@ topology_template:
           name: siemnet
           ipv4_address: 192.168.80.4
         hostname: logstash
-        ports: { 5400:5400 }
+        ports:
+          internal: 5400
+          external: 5400
         env:
           "XPACK_MONITORING_ENABLED": "false"
         volumes:
@@ -80,7 +84,9 @@ topology_template:
           name: siemnet
           ipv4_address: 192.168.80.5
         hostname: kibana
-        ports: { 5601:5601 }
+        ports:
+          internal: 5601
+          external: 5601
         env:
           "XPACK_MONITORING_ENABLED": "false"
 
@@ -93,7 +99,9 @@ topology_template:
           name: siemnet
           ipv4_address: 192.168.80.6
         hostname: logstash
-        ports: { 8080:8080 }
+        ports:
+          internal: 8080
+          external: 8080
         env:
           "DSIEM_WEB_ESURL": "http://elasticsearch:9200"
           "DSIEM_WEB_KBNURL": "http://kibana:5601"
