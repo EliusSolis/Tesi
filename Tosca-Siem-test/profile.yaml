@@ -35,10 +35,10 @@ data_types:
     derived_from: tosca.datatypes.Root
     properties:
       internal:
-        type: string
+        type: integer
         required: true
       external:
-        type: string
+        type: integer
         required: true
       protocol:
         type: string

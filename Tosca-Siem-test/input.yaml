@@ -13,9 +13,9 @@ topology_template:
       properties:
         name : siemnet
         driver: bridge
-      attributes:
-        subnet: 192.168.80.0/20
-        gateway: 192.168.80.1
+      #attributes:
+        #subnet: 192.168.80.0/20
+        #gateway: 192.168.80.1
 
     client:
       type: tf:terraform_host

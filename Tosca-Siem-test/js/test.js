@@ -9,6 +9,7 @@ traversal.coerce();
 let tf = '';
 let images = []
 let volumes = []
+
 writeProvider();
 
 // ciclo for per ogni nodo
@@ -18,6 +19,8 @@ for (let id in clout.vertexes) {
         tf += convert(vertex);
     }
 }
+
+
 setupImages();
 setupVolumes();
 puccini.write(tf);
@@ -36,21 +39,22 @@ function setupImages(){
 }
 
 function setupVolumes(){ // todo
+
     for (let volume in volumes){
         tf += 'volume '+volume+'\n';
-
     }
 
 }
 
 
 function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
+
     for (let name in node.properties.types) {
         switch (name){
-        case 'terraform_network':
+        case 'terraform::terraform_network':
             return convertNetwork(node);
             break
-        case "terraform_host":
+        case "terraform::terraform_host":
             return convertHost(node);
             break;
         }
@@ -81,21 +85,21 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
 
             if(p === 'volumes'){ // TODO
                 let name = String(property)
-                if (images.includes[name]){
-                    s += 'image = docker_image.image'+images.indexOf[name]+'.latest\n';
-                }else{
-                    s += 'image = docker_image.image'+images.length+'.latest\n';
-                    images.push(name);
-                }
+                continue;
+            }
+
+            if(p === 'command'){
+                s += p +' = ';
+                s += JSON.stringify(property) +'\n';
                 continue;
             }
 
             if(p === 'ports'){
-                s += p + '{\n';  // TODO bisogna cambiare tosca
-                s += 'internal = 9200\n';
-                s += 'external = 9200\n';
+                s += p + '{\n';
+                for (let name in property){
+                    s += name + ' = ' + property[name] +'\n';
+                }
                 s += '}\n';
-                s += JSON.stringify(property);
                 continue;
             }
 
