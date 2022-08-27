@@ -140,9 +140,9 @@ node_types:
         type: string
         default: bridge
         required: false
-      ip_version:
-        type: integer
-        default: 4
+      ipv6:
+        type: boolean
+        default: false
         required: false
     attributes:
       subnet:

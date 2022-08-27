@@ -108,15 +108,6 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
                 continue;
             }
 
-            if(p === 'ports'){
-                s += p + '{\n';
-                for (let name in property){
-                    s += name + ' = ' + property[name] +'\n';
-                }
-                s += '}\n';
-                continue;
-            }
-
             if(p === 'env'){
                 s += p + '= [\n';
                 for (let key in property){
@@ -182,7 +173,7 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
 
         switch(type){
                 case "object":
-                    s += name + '{\n';
+                    s += name + ' {\n';
                     s += convertGeneric(value);
                     s += '}\n';
                     break;
