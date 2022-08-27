@@ -61,11 +61,7 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
 
 
         s += 'resource "docker_volume" "' + properties['name'] + '"{\n';
-        for (let p in properties.properties){
-            let property = properties.properties[p];
-
-            s += baseConverter(p,property);
-        }
+        s += convertGeneric(properties.properties)
 
         s += '}\n'
         return s;
@@ -80,46 +76,42 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
         for (let p in properties.properties){
             let property = properties.properties[p];
 
-            if ( p === 'image'){
-                let name = String(property)
-                if (images.includes[name]){
-                    s += 'image = docker_image.image'+images.indexOf[name]+'.latest\n';
-                }else{
-                    s += 'image = docker_image.image'+images.length+'.latest\n';
-                    images.push(name);
-                }
-                continue;
+            switch(p){
+                case('image'):
+                    let name = String(property)
+                    if (images.includes[name]){
+                        s += 'image = docker_image.image'+images.indexOf[name]+'.latest\n';
+                    }else{
+                        s += 'image = docker_image.image'+images.length+'.latest\n';
+                        images.push(name);
+                    }
+                    break;
+
+                case('volumes'):
+                    for (let volume in property){
+                        s += 'volumes {\n'
+                        s += convertGeneric(property[volume]) + '\n';
+                        s += '}\n'
+                    }
+                    break;
+
+                case 'command':
+                    s += p +' = ';
+                    s += JSON.stringify(property) +'\n';
+                    break;
+
+                case 'env':
+                    s += p + '= [\n';
+                    for (let key in property){
+                        s += '"'+key+'='+property[key]+'",\n';
+                    }
+                    s = s.slice(0, -2);
+                    s += '\n]\n';
+                    break;
+
+                default:
+                    s += baseConverter(p, property);
             }
-
-
-
-            if(p === 'volumes'){ // TODO
-                for (let volume in property){
-                    s += 'volumes {\n'
-                    s += convertGeneric(property[volume]) + '\n';
-                    s += '}\n'
-                }
-                continue;
-            }
-
-            if(p === 'command'){
-                s += p +' = ';
-                s += JSON.stringify(property) +'\n';
-                continue;
-            }
-
-            if(p === 'env'){
-                s += p + '= [\n';
-                for (let key in property){
-                    s += '"'+key+'='+property[key]+'",\n';
-                }
-                s = s.slice(0, -2);
-                s += '\n]\n';
-                continue;
-            }
-
-
-            s += baseConverter(p, property);
         }
 
 
@@ -132,9 +124,7 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
         let s= '';
         s += 'resource "docker_network" "' + properties['name'] + '"{\n';
 
-        for (let p in properties.properties){
-            s += baseConverter(p, properties.properties[p]);
-        }
+        s+= convertGeneric(properties.properties)
 
 
         for (let p in properties.attributes){
