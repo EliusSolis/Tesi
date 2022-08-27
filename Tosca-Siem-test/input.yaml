@@ -13,9 +13,9 @@ topology_template:
       properties:
         name : siemnet
         driver: bridge
-      #attributes:
-        #subnet: 192.168.80.0/20
-        #gateway: 192.168.80.1
+      attributes:
+        subnet: 192.168.80.0/20
+        gateway: 192.168.80.1
 
     client:
       type: tf:terraform_host
@@ -73,7 +73,7 @@ topology_template:
           "XPACK_MONITORING_ENABLED": "false"
         volumes:
           - container_path: "/usr/share/logstash/pipeline/70_siem-plugin-suricata.conf"
-            host_path: "format(%s/%s, local.terraform_dir, pipeline/70_siem-plugin-suricata.conf)"
+            host_path: "/home/gz/repos/Tesi/terraform-main/pipeline/70_siem-plugin-suricata.conf"
 
     kibana:
       type: tf:terraform_host
@@ -113,13 +113,13 @@ topology_template:
           - volume_name: "filebeat-data"
             container_path: "/usr/share/filebeat/data"
           - container_path: "/dsiem/configs/directives_dsiem.json"
-            host_path: "format(%s/%s, local.terraform_dir, dsiem_directives)"
+            host_path: "/home/gz/repos/Tesi/terraform-main/dsiem_directives"
           - container_path: "/var/lib/suricata/rules/"
-            host_path: "format(%s/%s,local.terraform_dir, suricata_rules/)"
+            host_path: "/home/gz/repos/Tesi/terraform-main/suricata_rules/"
           - container_path: "/var/dsiem/web/dist/assets/config/esconfig.json"
-            host_path: "format(%s/%s, local.terraform_dir, esconfig.json)"
+            host_path: "/home/gz/repos/Tesi/terraform-main/esconfig.json"
           - container_path: "/var/dsiem/dpluger_suricata.json"
-            host_path: "format(%s/%s, local.terraform_dir, dpluger_suricata.json)"
+            host_path: "/home/gz/repos/Tesi/terraform-main/dpluger_suricata.json"
         command: [ "/bin/bash", "-c", "service suricata start && service filebeat start && /var/dsiem/dsiem serve --debug" ]
 
     filebeat-es:
@@ -137,3 +137,29 @@ topology_template:
             container_path: "/usr/share/filebeat/data"
           - volume_name: "dsiem-log"
             container_path: "/var/log/dsiem"
+
+    dsiem-log:
+      type: tf:terraform_volume
+      properties:
+        name: "dsiem-log"
+
+
+    filebeat-data:
+      type: tf:terraform_volume
+      properties:
+        name: filebeat-data
+
+    filebeat-es-data:
+      type: tf:terraform_volume
+      properties:
+        name: filebeat-es-data
+
+    suricata-log:
+      type: tf:terraform_volume
+      properties:
+        name: suricata-log
+
+    es-data:
+      type: tf:terraform_volume
+      properties:
+        name: es-data

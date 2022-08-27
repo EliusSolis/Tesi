@@ -8,7 +8,6 @@ traversal.coerce();
 
 let tf = '';
 let images = []
-let volumes = []
 
 writeProvider();
 
@@ -22,7 +21,6 @@ for (let id in clout.vertexes) {
 
 
 setupImages();
-setupVolumes();
 puccini.write(tf);
 
 function writeProvider(){   // scrive prime righe necessarie per tf
@@ -38,13 +36,6 @@ function setupImages(){
 
 }
 
-function setupVolumes(){ // todo
-
-    for (let volume in volumes){
-        tf += 'volume '+volume+'\n';
-    }
-
-}
 
 
 function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
@@ -57,16 +48,35 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
         case "terraform::terraform_host":
             return convertHost(node);
             break;
+        case "terraform::terraform_volume":
+            return converVolume(node);
+            break;
         }
     }
     return 'error'
+
+    function converVolume(node){
+        let properties = node.properties;
+        let s= '';
+
+
+        s += 'resource "docker_volume" "' + properties['name'] + '"{\n';
+        for (let p in properties.properties){
+            let property = properties.properties[p];
+
+            s += baseConverter(p,property);
+        }
+
+        s += '}\n'
+        return s;
+    }
 
     function convertHost(node){
         let properties = node.properties;
         let s= '';
 
 
-        s += 'resource "docker_container" ' + properties['name'] + '{\n';
+        s += 'resource "docker_container" "' + properties['name'] + '"{\n';
         for (let p in properties.properties){
             let property = properties.properties[p];
 
@@ -84,7 +94,11 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
 
 
             if(p === 'volumes'){ // TODO
-                let name = String(property)
+                for (let volume in property){
+                    s += 'volumes {\n'
+                    s += convertGeneric(property[volume]) + '\n';
+                    s += '}\n'
+                }
                 continue;
             }
 
@@ -125,21 +139,26 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
     function convertNetwork(node){
         let properties = node.properties;
         let s= '';
-        s += 'resource "docker_network" ' + properties['name'] + '{\n';
+        s += 'resource "docker_network" "' + properties['name'] + '"{\n';
 
         for (let p in properties.properties){
             s += baseConverter(p, properties.properties[p]);
         }
 
-        s += 'ipam_config {\n'
+
         for (let p in properties.attributes){
             let type = typeof property;
             if ( p === 'state'){
                 continue;
             }
-            s+= baseConverter(p,properties.attributes[p])
+            let temp = baseConverter(p,properties.attributes[p]);
+           if (temp.length > 1){
+                s += 'ipam_config {\n';
+                s += temp;
+                s += '}\n';
+           }
         }
-        s += '}\n';
+
         s += '}\n';
 
         return s;

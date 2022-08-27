@@ -150,3 +150,17 @@ node_types:
       gateway:
         type: string
 
+
+  terraform_volume:
+    description: node for volumes mounted by docker
+    derived_from: tosca.nodes.Root
+    properties:
+      name:
+        type: string
+        required: false
+      driver:
+        type: string
+        default: local
+        required: false
+
+
