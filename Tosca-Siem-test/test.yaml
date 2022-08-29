@@ -1,0 +1,3715 @@
+version: "1.0"
+metadata:
+  history:
+    - description: compile
+      timestamp: "2022-08-27T14:36:53.6910965+02:00"
+    - description: resolve
+      timestamp: 2022-08-27T14:36:53.7180863+02:00
+  puccini:
+    scriptlets:
+      terraform:
+        generate: "const traversal = require('tosca.lib.traversal');\r\nconst tosca = require('tosca.lib.utils');\r\n\r\ntraversal.coerce();\r\n\r\nlet tf = '';\r\nwriteProvider();\r\nfor (let id in clout.vertexes) {\r\n  let vertex = clout.vertexes[id];\r\n\r\n    let terraform = getTerraform(vertex);\r\n    if (terraform.resource) {\r\n        tf += 'resource ' + terraform.resource + ' ' + vertex.properties.name + ' {\\n'\r\n        for (let name in vertex.properties.properties) {\r\n            let property = vertex.properties.properties[name];\r\n            tf += '  ' + name + ' = \\\"' + property.replace(/\"/g, '\\\\\"') + '\\\"\\n';\r\n        }\r\n        tf += '}\\n';\r\n    }\r\n}\r\n\r\nfunction getTerraform(vertex) {\r\n    let terraform = {};\r\n    if (tosca.isTosca(vertex, 'NodeTemplate')) {\r\n        for (let name in vertex.properties.types) {\r\n\r\n            let type = vertex.properties.types[name];\r\n            tf += JSON.stringify(name);+'\\n'\r\n            if (type.metadata) {\r\n                terraform.resource = type.metadata['terraform.resource'];\r\n            }\r\n        }\r\n    }\r\n    return terraform;\r\n}\r\nfunction writeProvider(){\r\n    tf += 'terraform {\\nrequired_providers {\\ndocker = {\\nsource  = \"kreuzwerker/docker\"\\nversion = \"~> 2.13.0\"\\n}\\n}\\n}\\n\\nprovider \"docker\" {}\\n\\n';\r\n}\r\n\r\npuccini.write(tf);"
+      tosca:
+        coerce: |-
+          const traversal = require('tosca.lib.traversal');
+          const tosca = require('tosca.lib.utils');
+
+          traversal.coerce();
+          if (puccini.arguments.history !== 'false')
+            tosca.addHistory('coerce');
+          puccini.write(clout);
+        comparer:
+          version: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.2.2
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.2.2
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.2.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.2.2
+
+            exports.compare = function(a, b) {
+              if (a.$comparer !== b.$comparer)
+                throw 'both values must be of type "version"';
+              if (a.major !== b.major)
+                return a.major < b.major ? -1 : 1;
+              if (a.minor !== b.minor)
+                return a.minor < b.minor ? -1 : 1;
+              if (a.fix !== b.fix)
+                return a.fix < b.fix ? -1 : 1;
+              let aq = a.qualifier.toLowerCase();
+              let bq = b.qualifier.toLowerCase();
+              if (aq !== bq) // note: the qualifier is compared alphabetically, *not* semantically
+                return aq < bq ? -1 : 1;
+              if (a.build !== b.build)
+                return a.build < b.build ? -1 : 1;
+              return 0;
+            };
+        constraint:
+          _format: |-
+            exports.validate = function(v, format) {
+              if (arguments.length !== 2)
+                throw 'must have 1 argument';
+              if (!puccini.isType(v, 'ard.string'))
+                return 'not a string';
+              try {
+                puccini.validateFormat(v, format);
+              } catch (x) {
+                if (x.value && x.value.error)
+                  // Unwrap Go error
+                  return x.value.error();
+                else
+                  throw x;
+              }
+              return true;
+            };
+          equal: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.validate = function(v1, v2) {
+              if (arguments.length !== 2)
+                throw 'must have 1 argument';
+              return tosca.compare(v1, v2) === 0;
+            };
+          greater_or_equal: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.validate = function(v1, v2) {
+              if (arguments.length !== 2)
+                throw 'must have 1 argument';
+              return tosca.compare(v1, v2) >= 0;
+            };
+          greater_than: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.validate = function(v1, v2) {
+              if (arguments.length !== 2)
+                throw 'must have 1 argument';
+              return tosca.compare(v1, v2) > 0;
+            };
+          in_range: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.validate = function(v, lower, upper) {
+              if (arguments.length !== 3)
+                throw 'must have 2 arguments';
+              if ((v.lower !== undefined) && (v.upper !== undefined))
+                // Special case: is the range in range?
+                return (tosca.compare(v.lower, lower) >= 0) && (tosca.compare(v.upper, upper) <= 0);
+              else
+                return (tosca.compare(v, lower) >= 0) && (tosca.compare(v, upper) <= 0);
+            };
+          length: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.validate = function(v, length) {
+              if (arguments.length !== 2)
+                throw 'must have 1 argument';
+              return tosca.getLength(v) == length;
+            };
+          less_or_equal: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.validate = function(v1, v2) {
+              if (arguments.length !== 2)
+                throw 'must have 1 argument';
+              return tosca.compare(v1, v2) <= 0;
+            };
+          less_than: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.validate = function(v1, v2) {
+              if (arguments.length !== 2)
+                throw 'must have 1 argument';
+              return tosca.compare(v1, v2) < 0;
+            };
+          max_length: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.validate = function(v, length) {
+              if (arguments.length !== 2)
+                throw 'must have 1 argument';
+              return tosca.getLength(v) <= length;
+            };
+          min_length: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.validate = function(v, length) {
+              if (arguments.length !== 2)
+                throw 'must have 1 argument';
+              return tosca.getLength(v) >= length;
+            };
+          pattern: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            exports.validate = function(v, re) {
+              if (arguments.length !== 2)
+                throw 'must have 1 argument';
+              if (v.$string !== undefined)
+                v = v.$string;
+              return new RegExp('^' + re + '$').test(v);
+            };
+          schema: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+
+            exports.validate = function() {
+              // TODO
+              return true;
+            };
+          valid_values: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 3.6.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 3.5.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 3.5.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.validate = function(v) {
+              let values = Array.prototype.slice.call(arguments, 1);
+              for (let i = 0, l = values.length; i < l; i++)
+                if (tosca.deepEqual(values[i], v))
+                  return true;
+              return false;
+            };
+        function:
+          concat: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 4.3.1
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 4.3.1
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 4.3.1
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 4.3.1
+
+            exports.evaluate = function() {
+              let a = [];
+              let length = arguments.length;
+              for (let i = 0; i < length; i++) {
+                let argument = arguments[i];
+                if (argument.$string !== undefined)
+                  argument = argument.$string;
+                a.push(argument);
+              }
+              return a.join('');
+            };
+          get_artifact: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 4.8.1
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 4.8.1
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 4.8.1
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 4.8.1
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.evaluate = function(entity, artifactName, location, remove) {
+              if (arguments.length < 2)
+                throw 'must have at least 2 arguments';
+              let nodeTemplate = tosca.getModelableEntity.call(this, entity);
+              if (!nodeTemplate.artifacts || !(artifactName in nodeTemplate.artifacts))
+                throw puccini.sprintf('artifact "%s" not found in "%s"', artifactName, nodeTemplate.name);
+              let artifact = nodeTemplate.artifacts[artifactName];
+              if (artifact.$artifact === undefined)
+                return artifact.sourcePath;
+              return artifact.$artifact;
+            };
+          get_attribute: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 4.5.1
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 4.5.1
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 4.5.1
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 4.5.1
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.evaluate = function(entity, first) {
+              return tosca.getNestedValue.call(this, 'attribute', 'attributes', arguments);
+            };
+          get_input: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 4.4.1
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 4.4.1
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 4.4.1
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 4.4.1
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.evaluate = function(input) {
+              if (arguments.length !== 1)
+                throw 'must have 1 argument';
+              if (!tosca.isTosca(clout))
+                throw 'Clout is not TOSCA';
+              let inputs = clout.properties.tosca.inputs;
+              if (!(input in inputs))
+                throw puccini.sprintf('input "%s" not found', input);
+              let r = inputs[input];
+              r = clout.coerce(r);
+              return r;
+            };
+          get_nodes_of_type: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 4.7.1
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 4.7.1
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 4.7.1
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 4.7.1
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.evaluate = function(typeName) {
+              if (arguments.length !== 1)
+                throw 'must have 1 argument';
+              let names = [];
+              for (let id in clout.vertexes) {
+                let vertex = clout.vertexes[id];
+                if (tosca.isTosca(vertex))
+                  names.push(vertex.properties.name);
+              }
+              return names;
+            };
+          get_operation_output: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 4.6.1
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 4.6.1
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 4.6.1
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 4.6.1
+
+            exports.evaluate = function() {
+              return 'TODO';
+            };
+          get_property: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 4.4.2
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 4.4.2
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 4.4.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 4.4.2
+
+            const tosca = require('tosca.lib.utils');
+
+            exports.evaluate = function() {
+              return tosca.getNestedValue.call(this, 'property', 'properties', arguments);
+            };
+          join: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 4.3.2
+
+            exports.evaluate = function() {
+              let length = arguments.length;
+              if ((length < 1) || (length > 2))
+                throw 'must have 1 or 2 arguments';
+              let delimiter = (length == 2) ? arguments[1] : '';
+              let args = arguments[0];
+              length = args.length;
+              let a = [];
+              for (let i = 0; i < length; i++) {
+                let argument = args[i];
+                if (argument.$string !== undefined)
+                  argument = argument.$string;
+                a.push(argument);
+              }
+              return a.join(delimiter);
+            };
+          token: |-
+            // [TOSCA-Simple-Profile-YAML-v1.3] @ 4.3.3
+            // [TOSCA-Simple-Profile-YAML-v1.2] @ 4.3.3
+            // [TOSCA-Simple-Profile-YAML-v1.1] @ 4.3.2
+            // [TOSCA-Simple-Profile-YAML-v1.0] @ 4.3.2
+
+            exports.evaluate = function(v, separators, index) {
+              if (arguments.length !== 3)
+                throw 'must have 3 arguments';
+              if (v.$string !== undefined)
+                v = v.$string;
+              let s = v.split(new RegExp('[' + escape(separators) + ']'));
+              return s[index];
+            };
+
+            function escape(s) {
+              return s.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+            }
+        lib:
+          traversal: |-
+            const tosca = require('tosca.lib.utils');
+
+            exports.toCoercibles = function(clout_) {
+              if (!clout_)
+                clout_ = clout;
+              exports.traverseValues(clout_, function(data) {
+                return clout_.newCoercible(data.value, data.site, data.source, data.target);
+              });
+            };
+
+            exports.unwrapCoercibles = function(clout_) {
+              if (!clout_)
+                clout_ = clout;
+              exports.traverseValues(clout_, function(data) {
+                return clout_.unwrap(data.value);
+              });
+            };
+
+            exports.coerce = function(clout_) {
+              if (!clout_)
+                clout_ = clout;
+              exports.toCoercibles(clout_);
+              exports.traverseValues(clout_, function(data) {
+                return clout_.coerce(data.value);
+              });
+            };
+
+            exports.getValueInformation = function(clout_) {
+              if (!clout_)
+                clout_ = clout;
+              let information = {};
+              exports.traverseValues(clout_, function(data) {
+                if (data.value.$information)
+                  information[data.path.join('.')] = data.value.$information;
+                return data.value;
+              });
+              return information;
+            };
+
+            exports.hasQuirk = function(clout_, quirk) {
+              if (!clout_)
+                clout_ = clout;
+              let quirks = clout_.properties.tosca.metadata['puccini.quirks'];
+              if (quirks !== undefined) {
+                quirks = quirks.split(',');
+                for (let q = 0, l = quirks.length; q < l; q++)
+                  if (quirks[q] === quirk)
+                    return true;
+              }
+              return false;
+            };
+
+            exports.traverseValues = function(clout_, traverser) {
+              if (!clout_)
+                clout_ = clout;
+
+              if (tosca.isTosca(clout_)) {
+                exports.traverseObjectValues(traverser, ['inputs'], clout_.properties.tosca.inputs);
+                exports.traverseObjectValues(traverser, ['outputs'], clout_.properties.tosca.outputs);
+              }
+
+              for (let vertexId in clout_.vertexes) {
+                let vertex = clout_.vertexes[vertexId];
+                if (!tosca.isTosca(vertex))
+                  continue;
+
+                if (tosca.isNodeTemplate(vertex)) {
+                  let nodeTemplate = vertex.properties;
+                  let path = ['nodeTemplates', nodeTemplate.name];
+
+                  exports.traverseObjectValues(traverser, copyAndPush(path, 'properties'), nodeTemplate.properties, vertex);
+                  exports.traverseObjectValues(traverser, copyAndPush(path, 'attributes'), nodeTemplate.attributes, vertex);
+                  exports.traverseInterfaceValues(traverser, copyAndPush(path, 'interfaces'), nodeTemplate.interfaces, vertex)
+
+                  for (let capabilityName in nodeTemplate.capabilities) {
+                    let capability = nodeTemplate.capabilities[capabilityName];
+                    let capabilityPath = copyAndPush(path, 'capabilities', capabilityName);
+                    exports.traverseObjectValues(traverser, copyAndPush(capabilityPath, 'properties'), capability.properties, vertex);
+                    exports.traverseObjectValues(traverser, copyAndPush(capabilityPath, 'attributes'), capability.attributes, vertex);
+                  }
+
+                  for (let artifactName in nodeTemplate.artifacts) {
+                    let artifact = nodeTemplate.artifacts[artifactName];
+                    let artifactPath = copyAndPush(path, 'artifacts', artifactName);
+                    exports.traverseObjectValues(traverser, copyAndPush(artifactPath, 'properties'), artifact.properties, vertex);
+                    if (artifact.credential !== null)
+                      try {
+                        artifact.credential = traverser({
+                          path: copyAndPush(artifactPath, 'credential'),
+                          value: artifact.credential,
+                          site: vertex
+                        });
+                      } catch (x) {
+                        if ((typeof problems !== 'undefined') && x.value && x.value.error)
+                          // Unwrap Go error
+                          problems.reportError(x.value);
+                        else
+                          throw x;
+                      }
+                  }
+
+                  for (let e = 0, l = vertex.edgesOut.length; e < l; e++) {
+                    let edge = vertex.edgesOut[e];
+                    if (!tosca.isTosca(edge, 'Relationship'))
+                      continue;
+
+                    let relationship = edge.properties;
+                    let relationshipPath = copyAndPush(path, 'relationships', relationship.name);
+                    exports.traverseObjectValues(traverser, copyAndPush(relationshipPath, 'properties'), relationship.properties, edge, vertex, edge.target);
+                    exports.traverseObjectValues(traverser,copyAndPush(relationshipPath, 'attributes'), relationship.attributes, edge, vertex, edge.target);
+                    exports.traverseInterfaceValues(traverser, copyAndPush(relationshipPath, 'interfaces'), relationship.interfaces, edge, vertex, edge.target);
+                  }
+                } else if (tosca.isTosca(vertex, 'Group')) {
+                  let group = vertex.properties;
+                  let path = ['groups', group.name];
+
+                  exports.traverseObjectValues(traverser, copyAndPush(path, 'properties'), group.properties, vertex);
+                  exports.traverseInterfaceValues(traverser, copyAndPush(path, 'attributes'), group.interfaces, vertex)
+                } else if (tosca.isTosca(vertex, 'Policy')) {
+                  let policy = vertex.properties;
+                  let path = ['policies', policy.name];
+
+                  exports.traverseObjectValues(traverser, copyAndPush(path, 'properties'), policy.properties, vertex);
+                } else if (tosca.isTosca(vertex, 'Substitution')) {
+                  let substitution = vertex.properties;
+                  let path = ['substitution'];
+
+                  exports.traverseObjectValues(traverser, copyAndPush(path, 'properties'), substitution.properties, vertex);
+                }
+              }
+            };
+
+            exports.traverseInterfaceValues = function(traverser, path, interfaces, site, source, target) {
+              for (let interfaceName in interfaces) {
+                let interface_ = interfaces[interfaceName];
+                let interfacePath = copyAndPush(path, interfaceName)
+                exports.traverseObjectValues(traverser, copyAndPush(interfacePath, 'inputs'), interface_.inputs, site, source, target);
+                for (let operationName in interface_.operations)
+                  exports.traverseObjectValues(traverser, copyAndPush(interfacePath, 'operations', operationName), interface_.operations[operationName].inputs, site, source, target);
+              }
+            };
+
+            exports.traverseObjectValues = function(traverser, path, object, site, source, target) {
+              for (let key in object)
+                try {
+                  object[key] = traverser({
+                    path: copyAndPush(path, key),
+                    value: object[key],
+                    site: site,
+                    source: source,
+                    target: target
+                  });
+                } catch (x) {
+                  if ((typeof problems !== 'undefined') && x.value && x.value.error)
+                    // Unwrap Go error
+                    problems.reportError(x.value);
+                  else
+                    throw x;
+                }
+            };
+
+            function copyAndPush(array) {
+              let array_ = [];
+              for (let i = 0, l = array.length; i < l; i++)
+                array_.push(array[i]);
+              for (let i = 1, l = arguments.length; i < l; i++)
+                array_.push(arguments[i]);
+              return array_;
+            }
+          utils: |-
+            exports.isTosca = function(o, kind) {
+              if (o.metadata === undefined)
+                return false;
+              o = o.metadata['puccini'];
+              if (o === undefined)
+                return false;
+              if (o.version !== '1.0')
+                return false;
+              if (kind !== undefined)
+                return kind === o.kind;
+              return true;
+            };
+
+            exports.isNodeTemplate = function(vertex, typeName) {
+              if (exports.isTosca(vertex, 'NodeTemplate')) {
+                if (typeName !== undefined)
+                  return typeName in vertex.properties.types;
+                return true;
+              }
+              return false;
+            };
+
+            exports.setOutputValue = function(name, value) {
+              if (clout.properties.tosca === undefined)
+                return false;
+              let output = clout.properties.tosca.outputs[name];
+              if (output === undefined)
+                return false;
+
+              if (output.$information && output.$information.type)
+                switch (output.$information.type.name) {
+                case 'boolean':
+                  value = (value === 'true');
+                  break;
+                case 'integer':
+                  value = parseInt(value);
+                  break;
+                case 'float':
+                  value = parseFloat(value);
+                  break;
+                }
+
+              output.$value = value;
+              return true;
+            };
+
+            exports.getPolicyTargets = function(vertex) {
+              let targets = [];
+
+              function addTarget(target) {
+                for (let t = 0, l = targets.length; t < l; t++)
+                  if (targets[t].name === target.name)
+                    return;
+                targets.push(target);
+              }
+
+              for (let e = 0, l = vertex.edgesOut.length; e < l; e++) {
+                let edge = vertex.edgesOut[e];
+                if (exports.isTosca(edge, 'NodeTemplateTarget'))
+                  targets.push(clout.vertexes[edge.targetID].properties);
+                else if (toexportssca.isTosca(edge, 'GroupTarget')) {
+                  let members = exports.getGroupMembers(clout.vertexes[edge.targetID]);
+                  for (let m = 0, ll = members.length; m < ll; m++)
+                    addTarget(members[m])
+                }
+              }
+              return targets;
+            };
+
+            exports.getGroupMembers = function(vertex) {
+              let members = [];
+              for (let e = 0, l = vertex.edgesOut.length; e < l; e++) {
+                let edge = vertex.edgesOut[e];
+                if (exports.isTosca(edge, 'Member'))
+                  members.push(clout.vertexes[edge.targetID].properties);
+              }
+              return members;
+            };
+
+            exports.addHistory = function(description) {
+              let metadata = clout.metadata;
+              if (metadata === undefined)
+                metadata = clout.metadata = {};
+              let history = metadata.history;
+              if (history === undefined)
+                history = [];
+              else
+                history = history.slice(0);
+              history.push({
+                timestamp: puccini.now(),
+                description: description
+              });
+              metadata.history = history;
+            };
+
+            exports.getNestedValue = function(singular, plural, args) {
+              args = Array.prototype.slice.call(args);
+              let length = args.length;
+              if (length < 2)
+                throw 'must have at least 2 arguments';
+              let nodeTemplate = exports.getModelableEntity.call(this, args[0]);
+              let a = 1;
+              let arg = args[a];
+              let value = nodeTemplate[plural];
+              if (arg in nodeTemplate.capabilities) {
+                value = nodeTemplate.capabilities[arg][plural];
+                singular = puccini.sprintf('capability "%s" %s', arg, singular);
+                arg = args[++a];
+              } else for (let r = 0, l = nodeTemplate.requirements.length; r < l; r++) {
+                let requirement = nodeTemplate.requirements[r];
+                if ((requirement.name === arg) && requirement.relationship) {
+                  value = requirement.relationship[plural];
+                  singular = puccini.sprintf('relationship "%s" %s', arg, singular);
+                  arg = args[++a];
+                  break;
+                }
+              }
+              if ((typeof value === 'object') && (value !== null) && (arg in value))
+                value = value[arg];
+              else
+                throw puccini.sprintf('%s "%s" not found in "%s"', singular, arg, nodeTemplate.name);
+              value = clout.coerce(value);
+              for (let i = a + 1; i < length; i++) {
+                arg = args[i];
+                if ((typeof value === 'object') && (value !== null) && (arg in value))
+                  value = value[arg];
+                else
+                  throw puccini.sprintf('nested %s "%s" not found in "%s"', singular, args.slice(a, i+1).join('.'), nodeTemplate.name);
+              }
+              return value;
+            };
+
+            exports.getModelableEntity = function(entity) {
+              let vertex;
+              switch (entity) {
+              case 'SELF':
+                if (!this || !this.site)
+                  throw puccini.sprintf('"%s" cannot be used in this context', entity);
+                vertex = this.site;
+                break;
+              case 'SOURCE':
+                if (!this || !this.source)
+                  throw puccini.sprintf('"%s" cannot be used in this context', entity);
+                vertex = this.source;
+                break;
+              case 'TARGET':
+                if (!this || !this.target)
+                  throw puccini.sprintf('"%s" cannot be used in this context', entity);
+                vertex = this.target;
+                break;
+              case 'HOST':
+                if (!this || !this.site)
+                  throw puccini.sprintf('"%s" cannot be used in this context', entity);
+                vertex = exports.getHost(this.site);
+                break;
+              default:
+                for (let vertexId in clout.vertexes) {
+                  let vertex = clout.vertexes[vertexId];
+                  if (exports.isNodeTemplate(vertex) && (vertex.properties.name === entity))
+                    return vertex.properties;
+                }
+                vertex = {};
+              }
+              if (exports.isNodeTemplate(vertex))
+                return vertex.properties;
+              else
+                throw puccini.sprintf('node template "%s" not found', entity);
+            };
+
+            exports.getHost = function(vertex) {
+              for (let e = 0, l = vertex.edgesOut.length; e < l; e++) {
+                let edge = vertex.edgesOut[e];
+                if (exports.isTosca(edge, 'Relationship')) {
+                  for (let typeName in edge.properties.types) {
+                    let type = edge.properties.types[typeName];
+                    if (type.metadata.role === 'host')
+                      return edge.target;
+                  }
+                }
+              }
+              if (exports.isNodeTemplate(vertex))
+                throw puccini.sprintf('"HOST" not found for node template "%s"', vertex.properties.name);
+              else
+                throw '"HOST" not found';
+            };
+
+            exports.getComparable = function(v) {
+              if ((v === undefined) || (v === null))
+                return null;
+              let c = v.$number;
+              if (c !== undefined)
+                return c;
+              c = v.$string;
+              if (c !== undefined)
+                return c;
+              return v;
+            };
+
+            exports.getLength = function(v) {
+              if (v.$string !== undefined)
+                v = v.$string;
+              let length = v.length;
+              if (length === undefined)
+                length = Object.keys(v).length;
+              return length;
+            };
+
+            exports.compare = function(v1, v2) {
+              let c = v1.$comparer;
+              if (c === undefined)
+                c = v2.$comparer;
+              if (c !== undefined)
+                return clout.call(c, 'compare', [v1, v2]);
+              v1 = exports.getComparable(v1);
+              v2 = exports.getComparable(v2);
+              if (v1 == v2)
+                return 0;
+              else if (v1 < v2)
+                return -1;
+              else
+                return 1;
+            };
+
+            // See: https://stackoverflow.com/a/45683145
+            exports.deepEqual = function(v1, v2) {
+              if (v1 === v2)
+                return true;
+
+              if (exports.isPrimitive(v1) && exports.isPrimitive(v2))
+                return v1 === v2;
+
+              if (Object.keys(v1).length !== Object.keys(v2).length)
+                return false;
+
+              for (let key in v1) {
+                if (!(key in v2)) return false;
+                if (!exports.deepEqual(v1[key], v2[key])) return false;
+              }
+
+              return true;
+            };
+
+            exports.isPrimitive = function(obj) {
+              return obj !== Object(obj);
+            };
+        resolve: |-
+          const traversal = require('tosca.lib.traversal');
+          const tosca = require('tosca.lib.utils');
+
+          const enforceCapabilityOccurrences = !traversal.hasQuirk(clout, 'capabilities.occurrences.permissive');
+
+          // Remove existing relationships
+          let nodeTemplateVertexes = [];
+          for (let vertexId in clout.vertexes) {
+            let vertex = clout.vertexes[vertexId];
+            if (tosca.isNodeTemplate(vertex)) {
+              nodeTemplateVertexes.push(vertex);
+              let remove = [];
+              for (let e = 0, l = vertex.edgesOut.length; e < l; e++) {
+                let edge = vertex.edgesOut[e];
+                if (tosca.isTosca(edge, 'Relationship'))
+                  remove.push(edge);
+              }
+              for (let e = 0, l = remove.length; e < l; e++)
+                remove[e].remove();
+            }
+          }
+
+          // For consistent results, we will sort the node templates by name
+          nodeTemplateVertexes.sort(function(a, b) {
+            return a.properties.name < b.properties.name ? -1 : 1;
+          });
+
+          traversal.toCoercibles();
+
+          // Resolve all requirements
+          for (let v = 0, l = nodeTemplateVertexes.length; v < l; v++) {
+            let vertex = nodeTemplateVertexes[v];
+            let nodeTemplate = vertex.properties;
+            let requirements = nodeTemplate.requirements;
+            for (let r = 0, ll = requirements.length; r < ll; r++) {
+              let requirement = requirements[r];
+              resolve(vertex, nodeTemplate, requirement);
+            }
+          }
+
+          if (enforceCapabilityOccurrences)
+            for (let v = 0, l = nodeTemplateVertexes.length; v < l; v++) {
+              let vertex = nodeTemplateVertexes[v];
+              let nodeTemplate = vertex.properties;
+              let capabilities = nodeTemplate.capabilities;
+              for (let capabilityName in capabilities) {
+                let capability = capabilities[capabilityName];
+                let relationshipCount = countRelationships(vertex, capabilityName);
+                let minRelationshipCount = capability.minRelationshipCount;
+                if (relationshipCount < minRelationshipCount)
+                  notEnoughRelationships(capability.location, relationshipCount, minRelationshipCount)
+              }
+            }
+
+          traversal.unwrapCoercibles();
+
+          if (puccini.arguments.history !== 'false')
+            tosca.addHistory('resolve');
+          puccini.write(clout)
+
+          function resolve(sourceVertex, sourceNodeTemplate, requirement) {
+            let location = requirement.location;
+            let name = requirement.name;
+
+            if (isSubstituted(sourceNodeTemplate.name, name)) {
+              puccini.log.debugf('%s: skipping because in substitution mappings', location.path)
+              return;
+            }
+
+            let candidates = gatherCandidateNodeTemplates(sourceVertex, requirement);
+            if (candidates.length === 0) {
+              unsatisfied(location, name, 'there are no candidate node templates');
+              return;
+            }
+
+            candidates = gatherCandidateCapabilities(requirement, candidates);
+            if (candidates.length === 0) {
+              unsatisfied(location, name, 'no candidate node template provides required capability');
+              return;
+            }
+
+            // Gather priority candidates: those that have not yet fulfilled their minimum relationship count
+            let priorityCandidates = [];
+            for (let c = 0, l = candidates.length; c < l; c++) {
+              let candidate = candidates[c];
+              if ((candidate.capability.minRelationshipCount !== 0) && (countRelationships(candidate.vertex, candidate.capabilityName) < candidate.capability.minRelationshipCount))
+                priorityCandidates.push(candidate);
+            }
+
+            let chosen = null;
+
+            if (priorityCandidates.length !== 0)
+              // Of the priority candidates, pick the one with the highest minimum relationship count
+              // (needs to be fulfilled soonest)
+              for (let c = 0, l = priorityCandidates.length; c < l; c++) {
+                let candidate = priorityCandidates[c];
+                if ((chosen === null) || (candidate.capability.minRelationshipCount > chosen.capability.minRelationshipCount))
+                  chosen = candidate;
+              }
+            else
+              // Of the candidates, pick the one with highest maximum relationship count
+              // (has the most room)
+              for (let c = 0, l = candidates.length; c < l; c++) {
+                let candidate = candidates[c];
+                if ((chosen === null) || isMaxCountGreater(candidate.capability.maxRelationshipCount, chosen.capability.maxRelationshipCount))
+                  chosen = candidate;
+              }
+
+            puccini.log.debugf('%s: satisfied "%s" with capability "%s" in node template "%s"', location.path, name, chosen.capabilityName, chosen.nodeTemplateName);
+            addRelationship(sourceVertex, requirement, chosen.vertex, chosen.capabilityName);
+          }
+
+          function gatherCandidateNodeTemplates(sourceVertex, requirement) {
+            let path = requirement.location.path;
+            let nodeTemplateName = requirement.nodeTemplateName;
+            let nodeTypeName = requirement.nodeTypeName;
+            let nodeTemplatePropertyConstraints = requirement.nodeTemplatePropertyConstraints;
+            let capabilityPropertyConstraintsMap = requirement.capabilityPropertyConstraints;
+
+            let candidates = [];
+            for (let v = 0, l = nodeTemplateVertexes.length; v < l; v++) {
+              let vertex = nodeTemplateVertexes[v];
+              let candidateNodeTemplate = vertex.properties;
+              let candidateNodeTemplateName = candidateNodeTemplate.name;
+
+              if ((nodeTemplateName !== '') && (nodeTemplateName !== candidateNodeTemplateName)) {
+                puccini.log.debugf('%s: node template "%s" is not named "%s"', path, candidateNodeTemplateName, nodeTemplateName);
+                continue;
+              }
+
+              if ((nodeTypeName !== '') && !(nodeTypeName in candidateNodeTemplate.types)) {
+                puccini.log.debugf('%s: node template "%s" is not of type "%s"', path, candidateNodeTemplateName, nodeTypeName);
+                continue;
+              }
+
+              // Node filter
+              if ((nodeTemplatePropertyConstraints.length !== 0) && !arePropertiesValid(path, sourceVertex, 'node template', candidateNodeTemplateName, candidateNodeTemplate, nodeTemplatePropertyConstraints)) {
+                puccini.log.debugf('%s: properties of node template "%s" do not match constraints', path, candidateNodeTemplateName);
+                continue;
+              }
+
+              let candidateCapabilities = candidateNodeTemplate.capabilities;
+
+              // Capability filter
+              if (capabilityPropertyConstraintsMap.length !== 0) {
+                let valid = true;
+                for (let candidateCapabilityName in candidateCapabilities) {
+                  let candidateCapability = candidateCapabilities[candidateCapabilityName];
+
+                  // Try by name
+                  let capabilityPropertyConstraints = capabilityPropertyConstraintsMap[candidateCapabilityName];
+                  if (capabilityPropertyConstraints === undefined) {
+                    // Try by type name
+                    for (let candidateTypeName in candidateCapability.types) {
+                      capabilityPropertyConstraints = capabilityPropertyConstraintsMap[candidateTypeName];
+                      if (capabilityPropertyConstraints !== undefined) break;
+                    }
+                  }
+
+                  if ((capabilityPropertyConstraints !== undefined) && (capabilityPropertyConstraints.length !== 0) && !arePropertiesValid(path, sourceVertex, 'capability', candidateCapabilityName, candidateCapability, capabilityPropertyConstraints)) {
+                    puccini.log.debugf('%s: properties of capability "%s" in node template "%s" do not match constraints', path, candidateCapabilityName, candidateNodeTemplateName);
+                    valid = false;
+                    break;
+                  }
+                }
+                if (!valid)
+                  continue;
+              }
+
+              candidates.push({
+                vertex: vertex,
+                nodeTemplateName: candidateNodeTemplateName,
+                capabilities: candidateCapabilities
+              });
+            }
+
+            return candidates;
+          }
+
+          function gatherCandidateCapabilities(requirement, candidateNodeTemplates) {
+            let path = requirement.location.path;
+            let capabilityName = requirement.capabilityName;
+            let capabilityTypeName = requirement.capabilityTypeName;
+
+            let candidates = [];
+            for (let c = 0, l = candidateNodeTemplates.length; c < l; c++) {
+              let candidate = candidateNodeTemplates[c];
+              let candidateVertex = candidate.vertex;
+              let candidateNodeTemplateName = candidate.nodeTemplateName;
+
+              let candidateCapabilities = [];
+              for (let candidateCapabilityName in candidate.capabilities) {
+                candidateCapabilities.push({
+                  name: candidateCapabilityName,
+                  capability: candidate.capabilities[candidateCapabilityName]
+                });
+              }
+
+              // For consistent results, we will sort the candidate capabilities by name
+              candidateCapabilities.sort(function(a, b) {
+                return a.name < b.name ? -1 : 1;
+              });
+
+              for (let cc = 0, ll = candidateCapabilities.length; cc < ll; cc++) {
+                let candidateCapabilityName = candidateCapabilities[cc].name;
+
+                if ((capabilityName !== '') && (capabilityName !== candidateCapabilityName)) {
+                  puccini.log.debugf('%s: capability "%s" in node template "%s" is not named "%s"', path, candidateCapabilityName, candidateNodeTemplateName, capabilityName);
+                  continue;
+                }
+
+                let candidateCapability = candidateCapabilities[cc].capability;
+
+                if ((capabilityTypeName !== '') && !(capabilityTypeName in candidateCapability.types)) {
+                  puccini.log.debugf('%s: capability "%s" in node template "%s" is not of type "%s"', path, candidateCapabilityName, candidateNodeTemplateName, capabilityTypeName);
+                  continue;
+                }
+
+                if (enforceCapabilityOccurrences) {
+                  let maxRelationshipCount = candidateCapability.maxRelationshipCount;
+                  if ((maxRelationshipCount !== -1) && (countRelationships(candidateVertex, candidateCapabilityName) === maxRelationshipCount)) {
+                    puccini.log.debugf('%s: capability "%s" in node template "%s" already has %d relationships, the maximum allowed', path, candidateCapabilityName, candidateNodeTemplateName, maxRelationshipCount);
+                    continue;
+                  }
+                }
+
+                candidates.push({
+                  vertex: candidateVertex,
+                  nodeTemplateName: candidateNodeTemplateName,
+                  capability: candidateCapability,
+                  capabilityName: candidateCapabilityName
+                });
+              }
+            }
+
+            return candidates;
+          }
+
+          function addRelationship(sourceVertex, requirement, targetVertex, capabilityName) {
+            let edge = sourceVertex.newEdgeTo(targetVertex);
+            edge.metadata['puccini'] = {
+              version: '1.0',
+              kind: 'Relationship'
+            };
+
+            let relationship = requirement.relationship;
+            if (relationship)
+              edge.properties = {
+                name: requirement.name,
+                description: relationship.description,
+                types: relationship.types,
+                properties: relationship.properties,
+                attributes: relationship.attributes,
+                interfaces: relationship.interfaces,
+                capability: capabilityName
+              };
+            else
+              // Untyped relationship
+              edge.properties = {
+                name: requirement.name,
+                description: '',
+                types: {},
+                properties: {},
+                attributes: {},
+                interfaces: {},
+                capability: capabilityName
+              };
+          }
+
+          function countRelationships(vertex, capabilityName) {
+            let count = 0;
+            for (let e = 0, l = vertex.edgesIn.length; e < l; e++) {
+              let edge = vertex.edgesIn[e];
+              if (tosca.isTosca(edge, 'Relationship') && (edge.properties.capability === capabilityName))
+                count++;
+            }
+            return count;
+          }
+
+          function arePropertiesValid(path, sourceVertex, kind, name, entity, constraintsMap) {
+            let valid = true;
+
+            let properties = entity.properties;
+            for (let propertyName in constraintsMap) {
+              puccini.log.debugf('%s: applying constraints to property "%s" of %s "%s"', path, propertyName, kind, name);
+
+              let property = properties[propertyName];
+              if (property === undefined) {
+                // return false; GOJA: returning from inside for-loop is broken
+                valid = false;
+                break;
+              }
+
+              let constraints = constraintsMap[propertyName];
+              constraints = clout.newConstraints(constraints, sourceVertex, sourceVertex, entity)
+              if (!constraints.validate(property)) {
+                // return false; GOJA: returning from inside for-loop is broken
+                valid = false;
+                break;
+              }
+            }
+
+            return valid;
+          }
+
+          function isSubstituted(nodeTemplateName, requirementName) {
+            for (let vertexId in clout.vertexes) {
+              let vertex = clout.vertexes[vertexId];
+              if (tosca.isTosca(vertex, 'Substitution')) {
+                for (let e = 0, l = vertex.edgesOut.length; e < l; e++) {
+                  let edge = vertex.edgesOut[e];
+                  if (!tosca.isTosca(edge, 'RequirementMapping'))
+                    continue;
+
+                  if ((edge.target.properties.name === nodeTemplateName) && (edge.properties.target === requirementName))
+                    return true;
+                }
+
+                // There's only ever one substitution
+                return false;
+              }
+            }
+
+            return false;
+          }
+
+          function isMaxCountGreater(a, b) {
+            if (a == -1)
+              return b !== -1;
+            else if (b == -1)
+              return false;
+            return a > b;
+          }
+
+          function unsatisfied(location, name, message) {
+            if (typeof problems === 'undefined')
+              throw puccini.sprintf('%s: could not satisfy "%s" because %s', location.path, name, message);
+            else
+              problems.reportFull(11, 'Resolution', location.path, puccini.sprintf('could not satisfy "%s" because %s', name, message), location.row, location.column);
+          }
+
+          function notEnoughRelationships(location, relationshipCount, minRelationshipCount) {
+            if (typeof problems === 'undefined')
+              throw puccini.sprintf('%s: not enough relationships: %d < %d', location.path, relationshipCount, minRelationshipCount);
+            else
+              problems.reportFull(11, 'Resolution', location.path, puccini.sprintf('not enough relationships: %d < %d', relationshipCount, minRelationshipCount), location.row, location.column);
+          }
+    version: "1.0"
+properties:
+  tosca:
+    description: ""
+    inputs: {}
+    metadata: {}
+    outputs: {}
+vertexes:
+  _2DwIeEe3e9MP5nTqI6mAHMboZaJ:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["filebeat-es-data"].capabilities["feature"]
+            row: 152
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: filebeat-es-data
+      properties:
+        driver:
+          $information:
+            type:
+              name: string
+          $value: local
+        name:
+          $information:
+            type:
+              name: string
+          $value: filebeat-es-data
+      requirements: []
+      types:
+        terraform::terraform_volume:
+          description: node for volumes mounted by docker
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeEiOxWElcM6xUJcW9i6jhqk:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["dsiem-filebeat-suricata"].capabilities["feature"]
+            row: 93
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: dsiem-filebeat-suricata
+      properties:
+        command:
+          $information:
+            definition:
+              description: list of commands and related arguments that the host has to execute
+            entry:
+              name: string
+            type:
+              name: list
+          $list:
+            - $value: /bin/bash
+            - $value: -c
+            - $value: service suricata start && service filebeat start && /var/dsiem/dsiem serve --debug
+        env:
+          $information:
+            definition:
+              description: list of optional configurations for the environment of the host
+            key:
+              name: string
+            type:
+              name: map
+            value:
+              name: string
+          $map:
+            - $key:
+                $value: DSIEM_WEB_ESURL
+              $value: http://elasticsearch:9200
+            - $key:
+                $value: DSIEM_WEB_KBNURL
+              $value: http://kibana:5601
+        hostname:
+          $information:
+            type:
+              name: string
+          $value: logstash
+        image:
+          $information:
+            definition:
+              description: name of the image used by the host
+            type:
+              name: string
+          $value: docker_image.dsiem-filebeat-suricata.latest
+        init:
+          $information:
+            definition:
+              description: host initialization value
+            type:
+              name: boolean
+          $value: false
+        name:
+          $information:
+            type:
+              name: string
+          $value: dsiem
+        networks_advanced:
+          $information:
+            definition:
+              description: network configuration of the host
+            fields:
+              ipv4_address:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              name:
+                definition:
+                  description: network name
+                type:
+                  name: string
+            type:
+              description: network datatype used to define all configurations needed by an host
+              name: terraform::container.datatypes.network
+          $map:
+            - $information:
+                definition:
+                  description: network name
+                type:
+                  name: string
+              $key:
+                $value: name
+              $value: siemnet
+            - $information:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              $key:
+                $value: ipv4_address
+              $value: 192.168.80.6
+        ports:
+          $information:
+            definition:
+              description: port configuration of the host
+            fields:
+              external:
+                definition:
+                  description: external port value
+                type:
+                  name: integer
+              internal:
+                definition:
+                  description: internal port value
+                type:
+                  name: integer
+              ip:
+                definition:
+                  description: ip that can access the port
+                type:
+                  name: string
+              protocol:
+                definition:
+                  description: protocol used for the connection
+                type:
+                  name: string
+            type:
+              description: port datatype used to define all different properties of a port
+              name: terraform::container.datatypes.port
+          $map:
+            - $information:
+                definition:
+                  description: protocol used for the connection
+                type:
+                  name: string
+              $key:
+                $value: protocol
+              $value: tcp
+            - $information:
+                definition:
+                  description: ip that can access the port
+                type:
+                  name: string
+              $key:
+                $value: ip
+              $value: 0.0.0.0
+            - $information:
+                definition:
+                  description: internal port value
+                type:
+                  name: integer
+              $key:
+                $value: internal
+              $value: 8080
+            - $information:
+                definition:
+                  description: external port value
+                type:
+                  name: integer
+              $key:
+                $value: external
+              $value: 8080
+        volumes:
+          $information:
+            definition:
+              description: optional volumes linked to the host
+            entry:
+              description: volume properties used to describe an optional volume of an host
+              name: terraform::container.datatypes.volume
+            type:
+              name: list
+          $list:
+            - $map:
+                - $information:
+                    type:
+                      name: string
+                  $key:
+                    $value: volume_name
+                  $value: dsiem-log
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /dsiem/logs
+            - $map:
+                - $information:
+                    type:
+                      name: string
+                  $key:
+                    $value: volume_name
+                  $value: suricata-log
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /var/log/suricata
+            - $map:
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /usr/share/filebeat/data
+                - $information:
+                    type:
+                      name: string
+                  $key:
+                    $value: volume_name
+                  $value: filebeat-data
+            - $map:
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /dsiem/configs/directives_dsiem.json
+                - $information:
+                    definition:
+                      description: path used to retrieve an host
+                    type:
+                      name: string
+                  $key:
+                    $value: host_path
+                  $value: /home/gz/repos/Tesi/terraform-main/dsiem_directives
+            - $map:
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /var/lib/suricata/rules/
+                - $information:
+                    definition:
+                      description: path used to retrieve an host
+                    type:
+                      name: string
+                  $key:
+                    $value: host_path
+                  $value: /home/gz/repos/Tesi/terraform-main/suricata_rules/
+            - $map:
+                - $information:
+                    definition:
+                      description: path used to retrieve an host
+                    type:
+                      name: string
+                  $key:
+                    $value: host_path
+                  $value: /home/gz/repos/Tesi/terraform-main/esconfig.json
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /var/dsiem/web/dist/assets/config/esconfig.json
+            - $map:
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /var/dsiem/dpluger_suricata.json
+                - $information:
+                    definition:
+                      description: path used to retrieve an host
+                    type:
+                      name: string
+                  $key:
+                    $value: host_path
+                  $value: /home/gz/repos/Tesi/terraform-main/dpluger_suricata.json
+      requirements: []
+      types:
+        terraform::terraform_host:
+          description: host node type for terraform compability
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeFcxHNunAQsjaPDTPJevg1q:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["filebeat-es"].capabilities["feature"]
+            row: 125
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: filebeat-es
+      properties:
+        hostname:
+          $information:
+            type:
+              name: string
+          $value: filebeat-es
+        image:
+          $information:
+            definition:
+              description: name of the image used by the host
+            type:
+              name: string
+          $value: docker_image.filebeat-es.latest
+        init:
+          $information:
+            definition:
+              description: host initialization value
+            type:
+              name: boolean
+          $value: false
+        name:
+          $information:
+            type:
+              name: string
+          $value: filebeat-es
+        networks_advanced:
+          $information:
+            definition:
+              description: network configuration of the host
+            fields:
+              ipv4_address:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              name:
+                definition:
+                  description: network name
+                type:
+                  name: string
+            type:
+              description: network datatype used to define all configurations needed by an host
+              name: terraform::container.datatypes.network
+          $map:
+            - $information:
+                definition:
+                  description: network name
+                type:
+                  name: string
+              $key:
+                $value: name
+              $value: siemnet
+            - $information:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              $key:
+                $value: ipv4_address
+              $value: 192.168.80.7
+        user:
+          $information:
+            definition:
+              description: user that can access the host
+            type:
+              name: string
+          $value: root
+        volumes:
+          $information:
+            definition:
+              description: optional volumes linked to the host
+            entry:
+              description: volume properties used to describe an optional volume of an host
+              name: terraform::container.datatypes.volume
+            type:
+              name: list
+          $list:
+            - $map:
+                - $information:
+                    type:
+                      name: string
+                  $key:
+                    $value: volume_name
+                  $value: filebeat-es-data
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /usr/share/filebeat/data
+            - $map:
+                - $information:
+                    type:
+                      name: string
+                  $key:
+                    $value: volume_name
+                  $value: dsiem-log
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /var/log/dsiem
+      requirements: []
+      types:
+        terraform::terraform_host:
+          description: host node type for terraform compability
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeG4TJPBJ4HFWWyriTHqZQTC:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["elasticsearch"].capabilities["feature"]
+            row: 32
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: elasticsearch
+      properties:
+        env:
+          $information:
+            definition:
+              description: list of optional configurations for the environment of the host
+            key:
+              name: string
+            type:
+              name: map
+            value:
+              name: string
+          $map:
+            - $key:
+                $value: xpack.graph.enabled
+              $value: "false"
+            - $key:
+                $value: xpack.watcher.enabled
+              $value: "false"
+            - $key:
+                $value: xpack.security.enabled
+              $value: "false"
+            - $key:
+                $value: xpack.monitoring.enabled
+              $value: "false"
+            - $key:
+                $value: xpack.ml.enabled
+              $value: "false"
+            - $key:
+                $value: http.cors.allow-origin
+              $value: '*'
+            - $key:
+                $value: ES_JAVA_OPTS
+              $value: -Xms256m -Xmx256m
+            - $key:
+                $value: cluster.routing.allocation.disk.threshold_enabled
+              $value: "false"
+            - $key:
+                $value: http.cors.enabled
+              $value: "true"
+            - $key:
+                $value: http.cors.allow-headers
+              $value: Authorization,X-Requested-With,Content-Type,Content-Length
+            - $key:
+                $value: discovery.type
+              $value: single-node
+        hostname:
+          $information:
+            type:
+              name: string
+          $value: elasticsearch
+        image:
+          $information:
+            definition:
+              description: name of the image used by the host
+            type:
+              name: string
+          $value: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+        init:
+          $information:
+            definition:
+              description: host initialization value
+            type:
+              name: boolean
+          $value: false
+        name:
+          $information:
+            type:
+              name: string
+          $value: elasticsearch
+        networks_advanced:
+          $information:
+            definition:
+              description: network configuration of the host
+            fields:
+              ipv4_address:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              name:
+                definition:
+                  description: network name
+                type:
+                  name: string
+            type:
+              description: network datatype used to define all configurations needed by an host
+              name: terraform::container.datatypes.network
+          $map:
+            - $information:
+                definition:
+                  description: network name
+                type:
+                  name: string
+              $key:
+                $value: name
+              $value: siemnet
+            - $information:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              $key:
+                $value: ipv4_address
+              $value: 192.168.80.3
+        ports:
+          $information:
+            definition:
+              description: port configuration of the host
+            fields:
+              external:
+                definition:
+                  description: external port value
+                type:
+                  name: integer
+              internal:
+                definition:
+                  description: internal port value
+                type:
+                  name: integer
+              ip:
+                definition:
+                  description: ip that can access the port
+                type:
+                  name: string
+              protocol:
+                definition:
+                  description: protocol used for the connection
+                type:
+                  name: string
+            type:
+              description: port datatype used to define all different properties of a port
+              name: terraform::container.datatypes.port
+          $map:
+            - $information:
+                definition:
+                  description: internal port value
+                type:
+                  name: integer
+              $key:
+                $value: internal
+              $value: 9200
+            - $information:
+                definition:
+                  description: external port value
+                type:
+                  name: integer
+              $key:
+                $value: external
+              $value: 9200
+            - $information:
+                definition:
+                  description: protocol used for the connection
+                type:
+                  name: string
+              $key:
+                $value: protocol
+              $value: tcp
+            - $information:
+                definition:
+                  description: ip that can access the port
+                type:
+                  name: string
+              $key:
+                $value: ip
+              $value: 0.0.0.0
+        volumes:
+          $information:
+            definition:
+              description: optional volumes linked to the host
+            entry:
+              description: volume properties used to describe an optional volume of an host
+              name: terraform::container.datatypes.volume
+            type:
+              name: list
+          $list:
+            - $map:
+                - $information:
+                    type:
+                      name: string
+                  $key:
+                    $value: volume_name
+                  $value: es-data
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /usr/share/elasticsearch/data
+      requirements: []
+      types:
+        terraform::terraform_host:
+          description: host node type for terraform compability
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeGAiat1PoI7UcH2sOZ18Kbz:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["filebeat-data"].capabilities["feature"]
+            row: 147
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: filebeat-data
+      properties:
+        driver:
+          $information:
+            type:
+              name: string
+          $value: local
+        name:
+          $information:
+            type:
+              name: string
+          $value: filebeat-data
+      requirements: []
+      types:
+        terraform::terraform_volume:
+          description: node for volumes mounted by docker
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeGOAgiGCT9F3Bynbldx8Vh6:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["suricata-log"].capabilities["feature"]
+            row: 157
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: suricata-log
+      properties:
+        driver:
+          $information:
+            type:
+              name: string
+          $value: local
+        name:
+          $information:
+            type:
+              name: string
+          $value: suricata-log
+      requirements: []
+      types:
+        terraform::terraform_volume:
+          description: node for volumes mounted by docker
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeHIZyA99y1zFCQ1fHDJx1jP:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["es-data"].capabilities["feature"]
+            row: 162
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: es-data
+      properties:
+        driver:
+          $information:
+            type:
+              name: string
+          $value: local
+        name:
+          $information:
+            type:
+              name: string
+          $value: es-data
+      requirements: []
+      types:
+        terraform::terraform_volume:
+          description: node for volumes mounted by docker
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeJ6fW5luyJtzVkejYD6Q6jN:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["client"].capabilities["feature"]
+            row: 20
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: client
+      properties:
+        command:
+          $information:
+            definition:
+              description: list of commands and related arguments that the host has to execute
+            entry:
+              name: string
+            type:
+              name: list
+          $list:
+            - $value: sleep
+            - $value: 1h
+        hostname:
+          $information:
+            type:
+              name: string
+          $value: client
+        image:
+          $information:
+            definition:
+              description: name of the image used by the host
+            type:
+              name: string
+          $value: docker_image.ubuntu.latest
+        init:
+          $information:
+            definition:
+              description: host initialization value
+            type:
+              name: boolean
+          $value: true
+        name:
+          $information:
+            type:
+              name: string
+          $value: client
+        networks_advanced:
+          $information:
+            definition:
+              description: network configuration of the host
+            fields:
+              ipv4_address:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              name:
+                definition:
+                  description: network name
+                type:
+                  name: string
+            type:
+              description: network datatype used to define all configurations needed by an host
+              name: terraform::container.datatypes.network
+          $map:
+            - $information:
+                definition:
+                  description: network name
+                type:
+                  name: string
+              $key:
+                $value: name
+              $value: siemnet
+            - $information:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              $key:
+                $value: ipv4_address
+              $value: 192.168.80.2
+      requirements: []
+      types:
+        terraform::terraform_host:
+          description: host node type for terraform compability
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeJaDU10EsJkvwyWBT1Q1imM:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["kibana"].capabilities["feature"]
+            row: 78
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: kibana
+      properties:
+        env:
+          $information:
+            definition:
+              description: list of optional configurations for the environment of the host
+            key:
+              name: string
+            type:
+              name: map
+            value:
+              name: string
+          $map:
+            - $key:
+                $value: XPACK_MONITORING_ENABLED
+              $value: "false"
+        hostname:
+          $information:
+            type:
+              name: string
+          $value: kibana
+        image:
+          $information:
+            definition:
+              description: name of the image used by the host
+            type:
+              name: string
+          $value: docker_image.kibana.latest
+        init:
+          $information:
+            definition:
+              description: host initialization value
+            type:
+              name: boolean
+          $value: false
+        name:
+          $information:
+            type:
+              name: string
+          $value: kibana
+        networks_advanced:
+          $information:
+            definition:
+              description: network configuration of the host
+            fields:
+              ipv4_address:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              name:
+                definition:
+                  description: network name
+                type:
+                  name: string
+            type:
+              description: network datatype used to define all configurations needed by an host
+              name: terraform::container.datatypes.network
+          $map:
+            - $information:
+                definition:
+                  description: network name
+                type:
+                  name: string
+              $key:
+                $value: name
+              $value: siemnet
+            - $information:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              $key:
+                $value: ipv4_address
+              $value: 192.168.80.5
+        ports:
+          $information:
+            definition:
+              description: port configuration of the host
+            fields:
+              external:
+                definition:
+                  description: external port value
+                type:
+                  name: integer
+              internal:
+                definition:
+                  description: internal port value
+                type:
+                  name: integer
+              ip:
+                definition:
+                  description: ip that can access the port
+                type:
+                  name: string
+              protocol:
+                definition:
+                  description: protocol used for the connection
+                type:
+                  name: string
+            type:
+              description: port datatype used to define all different properties of a port
+              name: terraform::container.datatypes.port
+          $map:
+            - $information:
+                definition:
+                  description: internal port value
+                type:
+                  name: integer
+              $key:
+                $value: internal
+              $value: 5601
+            - $information:
+                definition:
+                  description: external port value
+                type:
+                  name: integer
+              $key:
+                $value: external
+              $value: 5601
+            - $information:
+                definition:
+                  description: ip that can access the port
+                type:
+                  name: string
+              $key:
+                $value: ip
+              $value: 0.0.0.0
+            - $information:
+                definition:
+                  description: protocol used for the connection
+                type:
+                  name: string
+              $key:
+                $value: protocol
+              $value: tcp
+      requirements: []
+      types:
+        terraform::terraform_host:
+          description: host node type for terraform compability
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeJpskVwDRHuFc6mO95CPvat:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["logstash"].capabilities["feature"]
+            row: 60
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: logstash
+      properties:
+        env:
+          $information:
+            definition:
+              description: list of optional configurations for the environment of the host
+            key:
+              name: string
+            type:
+              name: map
+            value:
+              name: string
+          $map:
+            - $key:
+                $value: XPACK_MONITORING_ENABLED
+              $value: "false"
+        hostname:
+          $information:
+            type:
+              name: string
+          $value: logstash
+        image:
+          $information:
+            definition:
+              description: name of the image used by the host
+            type:
+              name: string
+          $value: docker_image.logstash.latest
+        init:
+          $information:
+            definition:
+              description: host initialization value
+            type:
+              name: boolean
+          $value: false
+        name:
+          $information:
+            type:
+              name: string
+          $value: logstash
+        networks_advanced:
+          $information:
+            definition:
+              description: network configuration of the host
+            fields:
+              ipv4_address:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              name:
+                definition:
+                  description: network name
+                type:
+                  name: string
+            type:
+              description: network datatype used to define all configurations needed by an host
+              name: terraform::container.datatypes.network
+          $map:
+            - $information:
+                definition:
+                  description: network name
+                type:
+                  name: string
+              $key:
+                $value: name
+              $value: siemnet
+            - $information:
+                definition:
+                  description: ip address version 4 of the network
+                type:
+                  name: string
+              $key:
+                $value: ipv4_address
+              $value: 192.168.80.4
+        ports:
+          $information:
+            definition:
+              description: port configuration of the host
+            fields:
+              external:
+                definition:
+                  description: external port value
+                type:
+                  name: integer
+              internal:
+                definition:
+                  description: internal port value
+                type:
+                  name: integer
+              ip:
+                definition:
+                  description: ip that can access the port
+                type:
+                  name: string
+              protocol:
+                definition:
+                  description: protocol used for the connection
+                type:
+                  name: string
+            type:
+              description: port datatype used to define all different properties of a port
+              name: terraform::container.datatypes.port
+          $map:
+            - $information:
+                definition:
+                  description: external port value
+                type:
+                  name: integer
+              $key:
+                $value: external
+              $value: 5400
+            - $information:
+                definition:
+                  description: ip that can access the port
+                type:
+                  name: string
+              $key:
+                $value: ip
+              $value: 0.0.0.0
+            - $information:
+                definition:
+                  description: protocol used for the connection
+                type:
+                  name: string
+              $key:
+                $value: protocol
+              $value: tcp
+            - $information:
+                definition:
+                  description: internal port value
+                type:
+                  name: integer
+              $key:
+                $value: internal
+              $value: 5400
+        volumes:
+          $information:
+            definition:
+              description: optional volumes linked to the host
+            entry:
+              description: volume properties used to describe an optional volume of an host
+              name: terraform::container.datatypes.volume
+            type:
+              name: list
+          $list:
+            - $map:
+                - $information:
+                    definition:
+                      description: path of the container used
+                    type:
+                      name: string
+                  $key:
+                    $value: container_path
+                  $value: /usr/share/logstash/pipeline/70_siem-plugin-suricata.conf
+                - $information:
+                    definition:
+                      description: path used to retrieve an host
+                    type:
+                      name: string
+                  $key:
+                    $value: host_path
+                  $value: /home/gz/repos/Tesi/terraform-main/pipeline/70_siem-plugin-suricata.conf
+      requirements: []
+      types:
+        terraform::terraform_host:
+          description: host node type for terraform compability
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeK2FxDcg1DTIxmnUa8wjKKy:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        gateway:
+          $information:
+            type:
+              name: string
+          $value: 192.168.80.1
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        subnet:
+          $information:
+            type:
+              name: string
+          $value: 192.168.80.0/20
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["siem_network"].capabilities["feature"]
+            row: 11
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: siem_network
+      properties:
+        driver:
+          $information:
+            type:
+              name: string
+          $value: bridge
+        ip_version:
+          $information:
+            type:
+              name: integer
+          $value: 4
+        name:
+          $information:
+            type:
+              name: string
+          $value: siemnet
+      requirements: []
+      types:
+        terraform::terraform_network:
+          description: network node type for terraform compability
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []
+  _2DwIeKHpOZEbPkxGnXYaoizdPgz:
+    metadata:
+      puccini:
+        kind: NodeTemplate
+        version: "1.0"
+    properties:
+      artifacts: {}
+      attributes:
+        state:
+          $information:
+            definition:
+              description: The state of the node instance.
+            type:
+              name: string
+          $value: initial
+        tosca_id:
+          $information:
+            definition:
+              description: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+            type:
+              name: string
+          $value: null
+        tosca_name:
+          $information:
+            definition:
+              description: This attribute reflects the name of the Node Template as defined in the TOSCA service template. This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+            type:
+              name: string
+          $value: null
+      capabilities:
+        feature:
+          attributes: {}
+          description: ""
+          location:
+            column: 5
+            path: topology_template.node_templates["dsiem-log"].capabilities["feature"]
+            row: 141
+          maxRelationshipCount: -1
+          minRelationshipCount: 0
+          properties: {}
+          types:
+            tosca::Node:
+              description: The Node capability indicates the base capabilities of a TOSCA Node Type.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.2
+                tosca.canonical-name: tosca::Node
+                tosca.normative: "true"
+              parent: tosca::Root
+            tosca::Root:
+              description: This is the default (root) TOSCA Capability Type definition that all other TOSCA Capability Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.5.1
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+      description: ""
+      directives: []
+      interfaces:
+        Standard:
+          description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+          inputs: {}
+          notifications: {}
+          operations:
+            configure:
+              dependencies: []
+              description: Standard lifecycle configure operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            create:
+              dependencies: []
+              description: Standard lifecycle create operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            delete:
+              dependencies: []
+              description: Standard lifecycle delete operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            start:
+              dependencies: []
+              description: Standard lifecycle start operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+            stop:
+              dependencies: []
+              description: Standard lifecycle stop operation.
+              implementation: ""
+              inputs: {}
+              outputs: {}
+              timeout: -1
+          types:
+            tosca::Root:
+              description: This is the default (root) TOSCA Interface Type definition that all other TOSCA Interface Types derive from.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.3
+                tosca.canonical-name: tosca::Root
+                tosca.normative: "true"
+            tosca::Standard:
+              description: This lifecycle interface defines the essential, normative operations that TOSCA nodes may support.
+              metadata:
+                specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+                specification.location: 5.8.4
+                tosca.canonical-name: tosca::Standard
+                tosca.normative: "true"
+              parent: tosca::Root
+      metadata: {}
+      name: dsiem-log
+      properties:
+        driver:
+          $information:
+            type:
+              name: string
+          $value: local
+        name:
+          $information:
+            type:
+              name: string
+          $value: dsiem-log
+      requirements: []
+      types:
+        terraform::terraform_volume:
+          description: node for volumes mounted by docker
+          parent: tosca::Root
+        tosca::Root:
+          description: The TOSCA Root Node Type is the default type that all other TOSCA base Node Types derive from. This allows for all TOSCA nodes to have a consistent set of features for modeling and management (e.g., consistent definitions for requirements, capabilities and lifecycle interfaces).
+          metadata:
+            specification.citation: '[TOSCA-Simple-Profile-YAML-v1.3]'
+            specification.location: 5.9.1
+            tosca.canonical-name: tosca::Root
+            tosca.normative: "true"
+    edgesOut: []

@@ -1,0 +1,166 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+namespace: terraform
+
+description: >
+  terraform type declarations used in the TOSCA input for puccini-terraform
+
+metadata:
+  template_name: terraform types
+  puccini.scriptlet.import:terraform.generate: js/generate.js
+
+
+data_types:
+
+  container.datatypes.network:
+    description: network datatype used to define all configurations needed by an host
+    derived_from: tosca.datatypes.Root
+    properties:
+      name:
+        description: network name
+        type: string
+        required: true
+      aliases:
+        description: aliases of the container in the specific network
+        type: list
+        entry_schema:
+          type: string
+        required: false
+      ipv4_address:
+        description: ip address version 4 of the network
+        type: string
+        required: false
+      ipv6_address:
+        description: ip address version 4 of the  network
+        type: string
+        required: false
+  
+  container.datatypes.port:
+    description: port datatype used to define all different properties of a port
+    derived_from: tosca.datatypes.Root
+    properties:
+      internal:
+        description: internal port value
+        type: integer
+        required: true
+      external:
+        description: external port value
+        type: integer
+        required: true
+      protocol:
+        description: protocol used for the connection
+        type: string
+        required: false
+        default: tcp
+      ip:
+        description: ip that can access the port
+        type: string
+        required: false
+        default: 0.0.0.0
+
+  container.datatypes.volume:
+    description: volume properties used to describe an optional volume of an host
+    derived_from: tosca.datatypes.Root
+    properties:
+      volume_name:
+        type: string
+        required: false
+      container_path:
+        description: path of the container used
+        type: string
+        required: false
+      host_path:
+        description: path used to retrieve an host
+        type: string
+        required: false
+
+
+
+node_types:
+
+  terraform_host:
+    description: host node type for terraform compability
+    derived_from: tosca.nodes.Root
+    properties:
+      name:
+        type: string
+        required: true
+      hostname:
+        type: string
+        required: false
+      image:
+        description: name of the image used by the host
+        type: string
+        required: false
+      user:
+        description: user that can access the host
+        type: string
+        required: false
+      networks_advanced:
+        description: network configuration of the host
+        type: container.datatypes.network
+        required: false
+      ports:
+        description: port configuration of the host
+        type: container.datatypes.port
+        required: false
+      init:
+        description: host initialization value
+        type: boolean
+        default: false
+        required: false
+      command:
+        description: list of commands and related arguments that the host has to execute
+        type: list
+        entry_schema:
+          type: string
+        required: false
+      env:
+        description: list of optional configurations for the environment of the host
+        type: map
+        entry_schema:
+          type: string
+        required: false
+      volumes:
+        description: optional volumes linked to the host
+        type: list
+        entry_schema:
+          type: container.datatypes.volume
+        required: false
+
+  
+  terraform_network:
+    description: network node type for terraform compability
+    derived_from: tosca.nodes.Root
+    properties:
+      name:
+        type: string
+        required: true
+      driver:
+        type: string
+        default: bridge
+        required: false
+      ipv6:
+        type: boolean
+        default: false
+        required: false
+    attributes:
+      subnet:
+        type: string
+      gateway:
+        type: string
+
+
+  terraform_volume:
+    description: node for volumes mounted by docker
+    derived_from: tosca.nodes.Root
+    properties:
+      name:
+        type: string
+        required: false
+      driver:
+        type: string
+        default: local
+        required: false
+
+
