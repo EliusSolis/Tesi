@@ -1,9 +1,6 @@
 const traversal = require('tosca.lib.traversal');
 const tosca = require('tosca.lib.utils');
 
-
-
-
 traversal.coerce();
 
 let tf = '';
@@ -31,7 +28,7 @@ function setupImages(){
     for (let i = 0; i < images.length; i++) {
         tf += 'resource "docker_image" "image'+i+'" {\n';
         tf += 'name = "'+images[i]+'"\n';
-        tf += '}\n';
+        tf += '}\n\n';
     }
 
 }
@@ -63,7 +60,7 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
         s += 'resource "docker_volume" "' + properties['name'] + '"{\n';
         s += convertGeneric(properties.properties)
 
-        s += '}\n'
+        s += '}\n\n\n'
         return s;
     }
 
@@ -91,7 +88,7 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
                     for (let volume in property){
                         s += 'volumes {\n'
                         s += convertGeneric(property[volume]) + '\n';
-                        s += '}\n'
+                        s += '}\n\n'
                     }
                     break;
 
@@ -115,7 +112,7 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
         }
 
 
-        s += '}\n'
+        s += '}\n\n\n'
         return s;
     }
 
@@ -126,21 +123,22 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
 
         s+= convertGeneric(properties.properties)
 
-
+        let temp = ''
         for (let p in properties.attributes){
             let type = typeof property;
             if ( p === 'state'){
                 continue;
             }
-            let temp = baseConverter(p,properties.attributes[p]);
-           if (temp.length > 1){
+            temp += baseConverter(p,properties.attributes[p]);
+
+        }
+        if (temp.replace("\n","").length > 1){
                 s += 'ipam_config {\n';
                 s += temp;
-                s += '}\n';
+                s += '}\n\n';
            }
-        }
 
-        s += '}\n';
+        s += '}\n\n';
 
         return s;
     }
@@ -165,7 +163,7 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
                 case "object":
                     s += name + ' {\n';
                     s += convertGeneric(value);
-                    s += '}\n';
+                    s += '}\n\n';
                     break;
                 case "string":
                     s += name +' = "'+value+'"';
