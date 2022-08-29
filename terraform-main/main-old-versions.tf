@@ -176,6 +176,10 @@ resource "docker_container" "dsiem-filebeat-suricata" {
     host_path = format("%s/%s", local.terraform_dir, "dsiem_directives")
   }
   volumes {
+    container_path = "/dsiem/configs"
+    host_path = format("%s/%s", local.terraform_dir, "dsiem_directives")
+  }
+  volumes {
     container_path = "/var/lib/suricata/rules/"
     host_path = format("%s/%s",local.terraform_dir, "suricata_rules/")
   }
