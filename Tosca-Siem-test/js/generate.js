@@ -123,19 +123,20 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
 
         s+= convertGeneric(properties.properties)
 
-
+        let temp = ''
         for (let p in properties.attributes){
             let type = typeof property;
             if ( p === 'state'){
                 continue;
             }
-            let temp = baseConverter(p,properties.attributes[p]);
-           if (temp.length > 1){
+            temp += baseConverter(p,properties.attributes[p]);
+
+        }
+        if (temp.replace("\n","").length > 1){
                 s += 'ipam_config {\n';
                 s += temp;
                 s += '}\n\n';
            }
-        }
 
         s += '}\n\n';
 
