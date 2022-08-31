@@ -127,7 +127,10 @@ node_types:
         entry_schema:
           type: container.datatypes.volume
         required: false
-
+      restart:
+        type: boolean
+        default: false
+        required: false
   
   terraform_network:
     description: network node type for terraform compability
