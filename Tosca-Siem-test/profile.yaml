@@ -128,8 +128,8 @@ node_types:
           type: container.datatypes.volume
         required: false
       restart:
-        type: boolean
-        default: false
+        type: string
+        default: no
         required: false
   
   terraform_network:

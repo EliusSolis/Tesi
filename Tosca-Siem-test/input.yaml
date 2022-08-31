@@ -74,7 +74,7 @@ topology_template:
         volumes:
           - container_path: "/usr/share/logstash/pipeline/70_siem-plugin-suricata.conf"
             host_path: "/home/gz/repos/Tesi/terraform-main/pipeline/70_siem-plugin-suricata.conf"
-        restart: true
+        restart: yes
 
     kibana:
       type: tf:terraform_host
