@@ -80,7 +80,6 @@ data_types:
     properties:
       add:
         type: list
-        required: false
         entry_schema:
           type: string
         required: false
@@ -148,6 +147,13 @@ node_types:
       restart:
         type: string
         default: no
+        required: false
+      capabilities:
+        type: container.datatypes.capabilities
+        required: false
+      privileged:
+        type: boolean
+        default: false
         required: false
   
   terraform_network:
