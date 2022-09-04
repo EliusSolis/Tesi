@@ -129,6 +129,17 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
                     }
                     break;
 
+                case('capabilities'):
+                    s += 'capabilities {\n'
+                        if ('add' in property) {
+                            s += 'add = ' + JSON.stringify(property['add']) + '\n';
+                        }
+                        if ('drop' in property) {
+                            s += 'drop = ' + JSON.stringify(property['drop']) + '\n';
+                        }
+                    s += '}\n\n';
+                    break;
+
                 default:
                     s += baseConverter(p, property);
             }
