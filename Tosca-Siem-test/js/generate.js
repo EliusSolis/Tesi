@@ -48,6 +48,9 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
         case "terraform::terraform_volume":
             return converVolume(node);
             break;
+        case "terraform::terraform_image":
+            return convertImage(node);
+            break;
         }
     }
     return 'error'
@@ -58,6 +61,18 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
 
 
         s += 'resource "docker_volume" "' + properties['name'] + '"{\n';
+        s += convertGeneric(properties.properties)
+
+        s += '}\n\n\n'
+        return s;
+    }
+
+    function convertImage(node){
+        let properties = node.properties;
+        let s= '';
+
+
+        s += 'resource "docker_image" "' + properties['name'] + '"{\n';
         s += convertGeneric(properties.properties)
 
         s += '}\n\n\n'
