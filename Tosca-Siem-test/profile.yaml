@@ -166,4 +166,14 @@ node_types:
         default: local
         required: false
 
-
+  terraform_image:
+    description: node for docker images
+    derived_from: tosca.nodes.Root
+    properties:
+      name:
+        type: string
+        required: false
+      keep_locally:
+        type: boolean
+        default: false
+        required: false
