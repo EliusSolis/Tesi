@@ -99,7 +99,7 @@ topology_template:
         networks_advanced:
           name: siemnet
           ipv4_address: 192.168.80.6
-        hostname: logstash
+        hostname: dsiem
         ports:
           internal: 8080
           external: 8080
