@@ -1,0 +1,66 @@
+{
+  "directives": [
+    {
+      "id": 3005,
+      "name": "Http Host header poisoning (SRC_IP to DST_IP)",
+      "priority": 3,
+      "disabled": false,
+      "all_rules_always_active": false,
+      "kingdom": "Environmental Awareness",
+      "category": "http requests",
+      "rules": [
+        {
+          "name": "Http Host header poisoning",
+          "stage": 1,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000005
+          ],
+          "occurrence": 1,
+          "from": "ANY",
+          "to": "ANY",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 1,
+          "timeout": 0
+        },
+        {
+          "name": "Http Host header poisoning",
+          "stage": 2,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000005 
+          ],
+          "occurrence": 5,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 5,
+          "timeout": 10
+        },
+        {
+          "name": "Http Host header poisoning",
+          "stage": 3,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000005
+          ],
+          "occurrence": 10,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 10,
+          "timeout": 120
+        }
+      ]
+    }
+  ]
+}
