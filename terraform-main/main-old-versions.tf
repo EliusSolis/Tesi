@@ -32,6 +32,10 @@ resource "docker_network" "external_network" {
 resource "docker_network" "shared_network" {
   name   = "sharednet"
   driver = "bridge"
+  ipam_config {
+    subnet = "172.30.0.0/16"
+    gateway = "172.30.0.1"
+  }
 }
 
 resource "docker_image" "web_server" {
@@ -83,11 +87,13 @@ resource "docker_container" "web-server" {
   }
   networks_advanced {
     name = "siemnet"
+    ipv4_address = "192.168.80.7"
   }
   hostname = "web-server"
   capabilities {
     add = ["NET_ADMIN"]
   }
+  command = ["/bin/bash -c", "ip route add 172.30.0.0/16 via 192.168.80.6 && apache2-foreground"]
 }
 
 resource "docker_container" "client" {
@@ -99,10 +105,11 @@ resource "docker_container" "client" {
 
   networks_advanced {
     name = "sharednet"
+    ipv4_address = "172.30.0.3"
   }
   hostname = "client"
   init     = true
-  command  = ["sleep", "1h"]
+  command  = ["/bin/bash -c", "ip route add 192.168.80.0/20 via 172.30.0.2 && sleep 1h"]
   capabilities {
     add = ["NET_ADMIN"]
   }
@@ -198,6 +205,7 @@ resource "docker_container" "dsiem-filebeat-suricata" {
   }
   networks_advanced {
     name = "sharednet"
+    ipv4_address = "172.30.0.2"
   }
   hostname = "dsiem"
   ports {
@@ -212,6 +220,13 @@ resource "docker_container" "dsiem-filebeat-suricata" {
 
   env = ["DSIEM_WEB_ESURL=http://elasticsearch:9200",
   "DSIEM_WEB_KBNURL=http://kibana:5601"]
+
+  command = ["/bin/bash -c", "
+    sysctl -w net.ipv4.conf.eth0.route_localnet=1 && \
+    iptables --table nat --append POSTROUTING --out-interface eth0 -j MASQUERADE && \
+    iptables -I FORWARD -s 172.30.0.0/16 -d 192.168.80.0/20 -j ACCEPT && \
+    iptables -I FORWARD -s 192.168.80.0/20 -d 172.30.0.0/16 -j ACCEPT && \
+    service filebeat start && service suricata start && ./dsiem serve"]
   volumes {
     container_path = "/dsiem/logs"
     volume_name    = "dsiem-log"
