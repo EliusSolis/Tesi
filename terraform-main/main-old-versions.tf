@@ -84,12 +84,10 @@ resource "docker_container" "web-server" {
   networks_advanced {
     name = "siemnet"
   }
-
-  networks_advanced {
-    name = "sharednet"
-  }
-
   hostname = "web-server"
+  capabilities {
+    add = ["NET_ADMIN"]
+  }
 }
 
 resource "docker_container" "client" {
@@ -105,6 +103,9 @@ resource "docker_container" "client" {
   hostname = "client"
   init     = true
   command  = ["sleep", "1h"]
+  capabilities {
+    add = ["NET_ADMIN"]
+  }
 }
 
 resource "docker_container" "elasticsearch" {
@@ -167,6 +168,7 @@ resource "docker_container" "logstash" {
     container_path = "/usr/share/logstash/pipeline/70_siem-plugin-suricata.conf"
     host_path      = format("%s/%s", local.terraform_dir, "pipeline/70_siem-plugin-suricata.conf")
   }
+  restart = "unless-stopped" 
 }
 
 
@@ -202,6 +204,12 @@ resource "docker_container" "dsiem-filebeat-suricata" {
     internal = 8080
     external = 8080
   }
+
+  capabilities {
+    add = ["NET_ADMIN", "SYS_ADMIN"]
+  }
+  privileged = true
+
   env = ["DSIEM_WEB_ESURL=http://elasticsearch:9200",
   "DSIEM_WEB_KBNURL=http://kibana:5601"]
   volumes {
