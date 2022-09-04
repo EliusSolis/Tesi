@@ -112,9 +112,11 @@ node_types:
         description: user that can access the host
         type: string
         required: false
-      networks_advanced:
+      networks:
         description: network configuration of the host
-        type: container.datatypes.network
+        type: list
+        entry_schema:
+          type: container.datatypes.network
         required: false
       ports:
         description: port configuration of the host
