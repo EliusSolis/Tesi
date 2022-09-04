@@ -74,6 +74,22 @@ data_types:
         type: string
         required: false
 
+  container.datatypes.capabilities:
+    description: linux capabilities to add/drop
+    derived_from: tosca.datatypes.Root
+    properties:
+      add:
+        type: list
+        required: false
+        entry_schema:
+          type: string
+        required: false
+      drop:
+        type: list
+        entry_schema:
+          type: string
+        required: false
+
 
 
 node_types:

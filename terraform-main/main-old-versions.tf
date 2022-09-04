@@ -10,35 +10,53 @@ terraform {
 
 # convenience variables
 locals {
-   terraform_dir = "/home/gz/repos/Tesi/terraform-main"
+  terraform_dir = "/home/gz/repos/Tesi/terraform-main"
 }
 
 provider "docker" {}
 
 resource "docker_network" "siem_network" {
-  name = "siemnet"
+  name   = "siemnet"
   driver = "bridge"
   ipam_config {
-    subnet = "192.168.80.0/20"
+    subnet  = "192.168.80.0/20"
     gateway = "192.168.80.1"
   }
 }
 
+resource "docker_network" "external_network" {
+  name   = "extnet"
+  driver = "bridge"
+}
+
+resource "docker_network" "shared_network" {
+  name   = "sharednet"
+  driver = "bridge"
+}
+
+resource "docker_image" "web_server" {
+  name         = "gianzav/simple-web-server"
+  keep_locally = true
+}
 
 resource "docker_image" "elasticsearch" {
-  name = "docker.elastic.co/elasticsearch/elasticsearch:7.4.0"
+  name         = "docker.elastic.co/elasticsearch/elasticsearch:7.4.0"
+  keep_locally = true
 }
 
 resource "docker_image" "logstash" {
-  name = "gianzav/logstash:7.4.0"
+  name         = "gianzav/logstash:7.4.0"
+  keep_locally = true
 }
 
 resource "docker_image" "kibana" {
-  name = "docker.elastic.co/kibana/kibana:7.4.0"
+  name         = "docker.elastic.co/kibana/kibana:7.4.0"
+  keep_locally = true
 }
 
 resource "docker_image" "dsiem-filebeat-suricata" {
-  name = "gianzav/dfs:7.4.0"
+  name         = "gianzav/dfs:7.4.0"
+  keep_locally = true
   #  build {
   #    path = "../docker_images/dsiem_filebeat_suricata/"
   #    tag = ["dfs:latest"]
@@ -46,19 +64,43 @@ resource "docker_image" "dsiem-filebeat-suricata" {
 }
 
 resource "docker_image" "filebeat-es" {
-  name = "gianzav/filebeat-es:7.4.0"
+  name         = "gianzav/filebeat-es:7.4.0"
+  keep_locally = true
 }
 
 resource "docker_image" "ubuntu" {
-  name = "ubuntu"
+  name         = "gianzav/ubuntu-utils"
+  keep_locally = true
+}
+
+
+resource "docker_container" "web-server" {
+  image = docker_image.web_server.latest
+  name  = "web-server"
+  ports {
+    internal = 80
+    external = 12345
+  }
+  networks_advanced {
+    name = "siemnet"
+  }
+
+  networks_advanced {
+    name = "sharednet"
+  }
+
+  hostname = "web-server"
 }
 
 resource "docker_container" "client" {
   image = docker_image.ubuntu.latest
   name  = "client"
   networks_advanced {
-    name = "siemnet"
-    ipv4_address = "192.168.80.2"
+    name = "extnet"
+  }
+
+  networks_advanced {
+    name = "sharednet"
   }
   hostname = "client"
   init     = true
@@ -69,7 +111,7 @@ resource "docker_container" "elasticsearch" {
   image = docker_image.elasticsearch.latest
   name  = "elasticsearch"
   networks_advanced {
-    name = "siemnet"
+    name         = "siemnet"
     ipv4_address = "192.168.80.3"
   }
   hostname = "elasticsearch"
@@ -77,16 +119,16 @@ resource "docker_container" "elasticsearch" {
     internal = 9200
     external = 9200
   }
-#  env = ["discovery.type=single-node",
-#    "ES_JAVA_OPTS=-Xms256m -Xmx256m",
-#    "cluster.routing.allocation.disk.threshold_enabled=false",
-#    "xpack.security.enabled=false",
-#    "xpack.monitoring.enabled=false",
-#    "xpack.ml.enabled=false",
-#    "xpack.graph.enabled=false",
-#    "xpack.watcher.enabled=false",
-#    "http.cors.enabled=true",
-#  "http.cors.allow-origin='/https?://localhost(:[0-9]+)?/'"]
+  #  env = ["discovery.type=single-node",
+  #    "ES_JAVA_OPTS=-Xms256m -Xmx256m",
+  #    "cluster.routing.allocation.disk.threshold_enabled=false",
+  #    "xpack.security.enabled=false",
+  #    "xpack.monitoring.enabled=false",
+  #    "xpack.ml.enabled=false",
+  #    "xpack.graph.enabled=false",
+  #    "xpack.watcher.enabled=false",
+  #    "http.cors.enabled=true",
+  #  "http.cors.allow-origin='/https?://localhost(:[0-9]+)?/'"]
 
   env = ["discovery.type=single-node",
     "ES_JAVA_OPTS=-Xms256m -Xmx256m",
@@ -99,7 +141,7 @@ resource "docker_container" "elasticsearch" {
     "http.cors.enabled=true",
     "http.cors.allow-origin=*",
     "http.cors.allow-headers: Authorization,X-Requested-With,Content-Type,Content-Length"
-   ]
+  ]
   volumes {
     container_path = "/usr/share/elasticsearch/data"
     volume_name    = "es-data"
@@ -112,7 +154,7 @@ resource "docker_container" "logstash" {
   image = docker_image.logstash.latest
   name  = "logstash"
   networks_advanced {
-    name = "siemnet"
+    name         = "siemnet"
     ipv4_address = "192.168.80.4"
   }
   hostname = "logstash"
@@ -122,8 +164,8 @@ resource "docker_container" "logstash" {
   }
   env = ["XPACK_MONITORING_ENABLED=false"]
   volumes {
-     container_path = "/usr/share/logstash/pipeline/70_siem-plugin-suricata.conf"
-     host_path = format("%s/%s", local.terraform_dir, "pipeline/70_siem-plugin-suricata.conf")  
+    container_path = "/usr/share/logstash/pipeline/70_siem-plugin-suricata.conf"
+    host_path      = format("%s/%s", local.terraform_dir, "pipeline/70_siem-plugin-suricata.conf")
   }
 }
 
@@ -132,7 +174,7 @@ resource "docker_container" "kibana" {
   image = docker_image.kibana.latest
   name  = "kibana"
   networks_advanced {
-    name = "siemnet"
+    name         = "siemnet"
     ipv4_address = "192.168.80.5"
   }
   hostname = "kibana"
@@ -149,8 +191,11 @@ resource "docker_container" "dsiem-filebeat-suricata" {
   name  = "dsiem"
 
   networks_advanced {
-    name = "siemnet"
+    name         = "siemnet"
     ipv4_address = "192.168.80.6"
+  }
+  networks_advanced {
+    name = "sharednet"
   }
   hostname = "dsiem"
   ports {
@@ -173,23 +218,23 @@ resource "docker_container" "dsiem-filebeat-suricata" {
   }
   volumes {
     container_path = "/var/dsiem/configs"
-    host_path = format("%s/%s", local.terraform_dir, "dsiem_directives")
+    host_path      = format("%s/%s", local.terraform_dir, "dsiem_directives")
   }
   volumes {
     container_path = "/dsiem/configs"
-    host_path = format("%s/%s", local.terraform_dir, "dsiem_directives")
+    host_path      = format("%s/%s", local.terraform_dir, "dsiem_directives")
   }
   volumes {
     container_path = "/var/lib/suricata/rules/"
-    host_path = format("%s/%s",local.terraform_dir, "suricata_rules/")
+    host_path      = format("%s/%s", local.terraform_dir, "suricata_rules/")
   }
   volumes {
     container_path = "/var/dsiem/web/dist/assets/config/esconfig.json"
-    host_path = format("%s/%s", local.terraform_dir, "esconfig.json")
+    host_path      = format("%s/%s", local.terraform_dir, "esconfig.json")
   }
   volumes {
     container_path = "/var/dsiem/dpluger_suricata.json"
-    host_path = format("%s/%s", local.terraform_dir, "dpluger_suricata.json")
+    host_path      = format("%s/%s", local.terraform_dir, "dpluger_suricata.json")
   }
 }
 
@@ -199,7 +244,7 @@ resource "docker_container" "filebeat-es" {
   name  = "filebeat-es"
   user  = "root"
   networks_advanced {
-    name = "siemnet"
+    name         = "siemnet"
     ipv4_address = "192.168.80.7"
   }
   hostname = "filebeat-es"
