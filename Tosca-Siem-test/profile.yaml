@@ -196,7 +196,7 @@ node_types:
     properties:
       name:
         type: string
-        required: false
+        required: true
       keep_locally:
         type: boolean
         default: false
