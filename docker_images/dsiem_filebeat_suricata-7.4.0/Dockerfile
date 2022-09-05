@@ -2,7 +2,7 @@ FROM ubuntu
 
 RUN apt update && apt upgrade -y
 # Utilities for later use
-RUN apt install -y software-properties-common wget curl apt-transport-https unzip
+RUN apt install -y software-properties-common wget curl apt-transport-https unzip inetutils-ping iproute2 iptables
 
 # Add suricata repo and install it
 RUN add-apt-repository -y ppa:oisf/suricata-stable
