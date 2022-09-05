@@ -121,7 +121,7 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
                     s += '\n]\n';
                     break;
 
-                case('networks'):
+                case('networks_advanced'):
                     for (let net in property){
                         s += 'networks_advanced {\n'
                         s += convertGeneric(property[net]) + '\n';

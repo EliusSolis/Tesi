@@ -111,7 +111,7 @@ node_types:
         description: user that can access the host
         type: string
         required: false
-      networks:
+      networks_advanced:
         description: network configuration of the host
         type: list
         entry_schema:
