@@ -74,6 +74,21 @@ data_types:
         type: string
         required: false
 
+  container.datatypes.capabilities:
+    description: linux capabilities to add/drop
+    derived_from: tosca.datatypes.Root
+    properties:
+      add:
+        type: list
+        entry_schema:
+          type: string
+        required: false
+      drop:
+        type: list
+        entry_schema:
+          type: string
+        required: false
+
 
 
 node_types:
@@ -98,7 +113,9 @@ node_types:
         required: false
       networks_advanced:
         description: network configuration of the host
-        type: container.datatypes.network
+        type: list
+        entry_schema:
+          type: container.datatypes.network
         required: false
       ports:
         description: port configuration of the host
@@ -130,6 +147,13 @@ node_types:
       restart:
         type: string
         default: no
+        required: false
+      capabilities:
+        type: container.datatypes.capabilities
+        required: false
+      privileged:
+        type: boolean
+        default: false
         required: false
   
   terraform_network:
@@ -166,4 +190,14 @@ node_types:
         default: local
         required: false
 
-
+  terraform_image:
+    description: node for docker images
+    derived_from: tosca.nodes.Root
+    properties:
+      name:
+        type: string
+        required: false
+      keep_locally:
+        type: boolean
+        default: false
+        required: false

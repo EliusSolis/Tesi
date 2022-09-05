@@ -48,6 +48,9 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
         case "terraform::terraform_volume":
             return converVolume(node);
             break;
+        case "terraform::terraform_image":
+            return convertImage(node);
+            break;
         }
     }
     return 'error'
@@ -58,6 +61,18 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
 
 
         s += 'resource "docker_volume" "' + properties['name'] + '"{\n';
+        s += convertGeneric(properties.properties)
+
+        s += '}\n\n\n'
+        return s;
+    }
+
+    function convertImage(node){
+        let properties = node.properties;
+        let s= '';
+
+
+        s += 'resource "docker_image" "' + properties['name'] + '"{\n';
         s += convertGeneric(properties.properties)
 
         s += '}\n\n\n'
@@ -104,6 +119,25 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
                     }
                     s = s.slice(0, -2);
                     s += '\n]\n';
+                    break;
+
+                case('networks_advanced'):
+                    for (let net in property){
+                        s += 'networks_advanced {\n'
+                        s += convertGeneric(property[net]) + '\n';
+                        s += '}\n\n'
+                    }
+                    break;
+
+                case('capabilities'):
+                    s += 'capabilities {\n'
+                        if ('add' in property) {
+                            s += 'add = ' + JSON.stringify(property['add']) + '\n';
+                        }
+                        if ('drop' in property) {
+                            s += 'drop = ' + JSON.stringify(property['drop']) + '\n';
+                        }
+                    s += '}\n\n';
                     break;
 
                 default:
