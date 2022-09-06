@@ -1,0 +1,5 @@
+# alert http any any -> any any (msg: "http traffic"; sid: 1000000;)
+alert icmp any any -> any any (msg: "icmp traffic"; sid: 1000001;)
+alert http any any -> any any (msg: "python http request"; http.user_agent; content:"python"; sid: 1000002;)
+#alert http 192.168.80.2 any -> any 8080 (msg: "request from client on port 8080"; sid: 1000003;)
+alert http any any -> 192.168.88.3 80 (msg:"HTTP Host header poisoning to vulnerable web server"; http.host; content:!"192.168.88.3"; sid: 1000005;)
