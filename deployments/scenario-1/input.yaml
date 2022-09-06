@@ -1,0 +1,257 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+- file: ./Tosca-Siem-test/profile.yaml
+  namespace_prefix: tf
+
+topology_template:
+
+  node_templates:
+
+    ubuntu_image:
+      type: tf:terraform_image
+      properties:
+        name: gianzav/ubuntu-utils
+        keep_locally: true
+
+    filebeat-es_image:
+        type: tf:terraform_image
+        properties:
+          name: gianzav/filebeat-es:7.4.0
+          keep_locally: true
+
+    filebeat_image:
+        type: tf:terraform_image
+        properties:
+            name: docker.elastic.co/beats/filebeat:7.4.0
+            keep_locally: true
+
+    elasticsearch_image:
+        type: tf:terraform_image
+        properties:
+            name: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+            keep_locally: true
+
+    dfs_image:
+        type: tf:terraform_image
+        properties:
+            name: gianzav/dfs:7.4.0
+            keep_locally: true
+
+    kibana_image:
+        type: tf:terraform_image
+        properties:
+            name: docker.elastic.co/kibana/kibana:7.4.0
+            keep_locally: true
+
+    web-server_image:
+        type: tf:terraform_image
+        properties:
+            name: gianzav/simple-web-server
+            keep_locally: true
+
+    logstash_image:
+        type: tf:terraform_image
+        properties:
+            name: gianzav/logstash:7.4.0
+            keep_locally: true
+
+    siem_network:
+      type: tf:terraform_network
+      properties:
+        name : siemnet
+        driver: bridge
+      attributes:
+        subnet: 192.168.80.0/20
+        gateway: 192.168.80.1
+
+    shared_network:
+      type: tf:terraform_network
+      properties:
+        name : sharednet
+        driver: bridge
+      attributes:
+        subnet: 172.30.0.0/16
+        gateway: 172.30.0.1
+            
+        
+
+    external_network:
+      type: tf:terraform_network
+      properties:
+        name : extnet
+        driver: bridge
+
+    web_server:
+      type: tf:terraform_host
+      properties:
+        image: web-server_image
+        name: webserver
+        networks_advanced:
+          - name: siemnet
+            ipv4_address: 192.168.80.10
+        hostname: webserver
+        ports:
+          internal: 80
+          external: 80
+        capabilities:
+            add: [NET_ADMIN]
+
+    client:
+      type: tf:terraform_host
+      properties:
+        image: ubuntu_image
+        name: client
+        networks_advanced:
+          - name: extnet
+          - name: sharednet
+            ipv4_address: 172.30.0.3
+        hostname: client
+        init: true
+        capabilities:
+            add: [NET_ADMIN]
+        command: [ sleep, 1h ]
+
+    elasticsearch:
+      type: tf:terraform_host
+      properties:
+        image: elasticsearch_image
+        name: elasticsearch
+        networks_advanced:
+          - name : siemnet
+            ipv4_address : 192.168.80.3
+        hostname: elasticsearch
+        ports:
+          internal: 9200
+          external: 9200
+        env:
+          "discovery.type": "single-node"
+          "ES_JAVA_OPTS": "-Xms256m -Xmx256m"
+          "cluster.routing.allocation.disk.threshold_enabled": "false"
+          "xpack.security.enabled": "false"
+          "xpack.monitoring.enabled": "false"
+          "xpack.ml.enabled": "false"
+          "xpack.graph.enabled": "false"
+          "xpack.watcher.enabled": "false"
+          "http.cors.enabled": "true"
+          "http.cors.allow-origin": "*"
+          "http.cors.allow-headers": "Authorization,X-Requested-With,Content-Type,Content-Length"
+        volumes:
+          - volume_name: es-data
+            container_path: /usr/share/elasticsearch/data
+
+    logstash:
+      type: tf:terraform_host
+      properties:
+        image: logstash_image
+        name: logstash
+        networks_advanced:
+          - name: siemnet
+            ipv4_address: 192.168.80.4
+        hostname: logstash
+        ports:
+          internal: 5400
+          external: 5400
+        env:
+          "XPACK_MONITORING_ENABLED": "false"
+        volumes:
+          - container_path: "/usr/share/logstash/pipeline/70_siem-plugin-suricata.conf"
+            host_path: "/home/gz/cyber_range/terraform-main/pipeline/70_siem-plugin-suricata.conf"
+        restart:
+            "unless-stopped"
+
+    kibana:
+      type: tf:terraform_host
+      properties:
+        image: kibana_image
+        name: kibana
+        networks_advanced:
+          - name: siemnet
+            ipv4_address: 192.168.80.5
+        hostname: kibana
+        ports:
+          internal: 5601
+          external: 5601
+        env:
+          "XPACK_MONITORING_ENABLED": "false"
+
+    dsiem-filebeat-suricata:
+      type: tf:terraform_host
+      properties:
+        image: dfs_image
+        name: dsiem
+        networks_advanced:
+          - name: siemnet
+            ipv4_address: 192.168.80.6
+          - name: sharednet
+            ipv4_address: 172.30.0.2
+        hostname: dsiem
+        ports:
+          internal: 8080
+          external: 8080
+        env:
+          "DSIEM_WEB_ESURL": "http://elasticsearch:9200"
+          "DSIEM_WEB_KBNURL": "http://kibana:5601"
+        capabilities:
+          add:  ["NET_ADMIN", "SYS_ADMIN"]
+        privileged: true
+
+        volumes:
+          - volume_name: "dsiem-log"
+            container_path: "/dsiem/logs"
+          - volume_name: "suricata-log"
+            container_path: "/var/log/suricata"
+          - volume_name: "filebeat-data"
+            container_path: "/usr/share/filebeat/data"
+          - container_path: "/dsiem/configs/"
+            host_path: "/home/gz/cyber_range/terraform-main/dsiem_directives"
+          - container_path: "/var/dsiem/configs/"
+            host_path: "/home/gz/cyber_range/terraform-main/dsiem_directives"
+          - container_path: "/var/lib/suricata/rules/"
+            host_path: "/home/gz/cyber_range/terraform-main/suricata_rules/"
+          - container_path: "/var/dsiem/web/dist/assets/config/esconfig.json"
+            host_path: "/home/gz/cyber_range/terraform-main/esconfig.json"
+          - container_path: "/var/dsiem/dpluger_suricata.json"
+            host_path: "/home/gz/cyber_range/terraform-main/dpluger_suricata.json"
+
+    filebeat-es:
+      type: tf:terraform_host
+      properties:
+        image: filebeat-es_image
+        name: filebeat-es
+        user: root
+        networks_advanced:
+          - name: siemnet
+            ipv4_address: 192.168.80.7
+        hostname: filebeat-es
+        volumes:
+          - volume_name: "filebeat-es-data"
+            container_path: "/usr/share/filebeat/data"
+          - volume_name: "dsiem-log"
+            container_path: "/var/log/dsiem"
+
+    dsiem-log:
+      type: tf:terraform_volume
+      properties:
+        name: "dsiem-log"
+
+
+    filebeat-data:
+      type: tf:terraform_volume
+      properties:
+        name: filebeat-data
+
+    filebeat-es-data:
+      type: tf:terraform_volume
+      properties:
+        name: filebeat-es-data
+
+    suricata-log:
+      type: tf:terraform_volume
+      properties:
+        name: suricata-log
+
+    es-data:
+      type: tf:terraform_volume
+      properties:
+        name: es-data

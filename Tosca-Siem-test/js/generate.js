@@ -89,14 +89,19 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
             let property = properties.properties[p];
 
             switch(p){
+                // case('image'):
+                //     let name = String(property)
+                //     if (images.includes[name]){
+                //         s += 'image = docker_image.image'+images.indexOf[name]+'.latest\n';
+                //     }else{
+                //         s += 'image = docker_image.image'+images.length+'.latest\n';
+                //         images.push(name);
+                //     }
+                //     break;
+
                 case('image'):
                     let name = String(property)
-                    if (images.includes[name]){
-                        s += 'image = docker_image.image'+images.indexOf[name]+'.latest\n';
-                    }else{
-                        s += 'image = docker_image.image'+images.length+'.latest\n';
-                        images.push(name);
-                    }
+                    s += 'image = docker_image.' + name +'.latest\n';
                     break;
 
                 case('volumes'):

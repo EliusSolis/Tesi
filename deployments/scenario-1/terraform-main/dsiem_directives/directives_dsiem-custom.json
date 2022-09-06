@@ -1,0 +1,66 @@
+{
+  "directives": [
+    {
+      "id": 3004,
+      "name": "python http request (SRC_IP to DST_IP)",
+      "priority": 3,
+      "disabled": false,
+      "all_rules_always_active": false,
+      "kingdom": "Environmental Awareness",
+      "category": "http requests",
+      "rules": [
+        {
+          "name": "python http request",
+          "stage": 1,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000002
+          ],
+          "occurrence": 1,
+          "from": "ANY",
+          "to": "ANY",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 1,
+          "timeout": 0
+        },
+        {
+          "name": "python http request",
+          "stage": 2,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000002
+          ],
+          "occurrence": 10,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 5,
+          "timeout": 3600
+        },
+        {
+          "name": "python http request",
+          "stage": 3,
+          "plugin_id": 1001,
+          "plugin_sid": [
+            1000002
+          ],
+          "occurrence": 10000,
+          "from": ":1",
+          "to": ":1",
+          "type": "PluginRule",
+          "port_from": "ANY",
+          "port_to": "ANY",
+          "protocol": "ANY",
+          "reliability": 10,
+          "timeout": 21600
+        }
+      ]
+    }
+  ]
+}
