@@ -117,6 +117,11 @@ function convert(node){  // dato un nodo tosca ritorna la stringa tf equivalente
                     s += JSON.stringify(property) +'\n';
                     break;
 
+                case 'dns':
+                    s += p +' = ';
+                    s += JSON.stringify(property) +'\n';
+                    break;
+
                 case 'env':
                     s += p + '= [\n';
                     for (let key in property){
