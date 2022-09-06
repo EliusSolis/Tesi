@@ -147,6 +147,7 @@ topology_template:
         capabilities:
             add: [NET_ADMIN]
         command: [ sleep, 1h ]
+        dns: ["192.168.88.4"]
 
     elasticsearch:
       type: tf:terraform_host
