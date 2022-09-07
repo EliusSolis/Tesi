@@ -10,6 +10,18 @@ topology_template:
 
 # ========== IMAGES ===============
 
+    postgres_image:
+      type: tf:terraform_image
+      properties:
+        name: gianzav/postgres-cyberrange
+        keep_locally: true
+
+    pyjail_image:
+      type: tf:terraform_image
+      properties:
+        name: gianzav/horse-with-no-name:uiuctf
+        keep_locally: true
+
     dnsmasq_image:
       type: tf:terraform_image
       properties:
@@ -103,6 +115,34 @@ topology_template:
 
 
 # ========== HOSTS ===============
+
+    database:
+      type: tf:terraform_host
+      properties:
+        image: postgres_image
+        name: postgres
+        networks_advanced:
+          - name: servernet
+            ipv4_address: 192.168.80.9
+        hostname: postgres
+        capabilities:
+          add: ["NET_ADMIN"]
+        env:
+          "POSTGRES_PASSWORD": "password"
+          "POSTGRES_DB" : "webapp"
+
+    pyjail:
+      type: tf:terraform_host
+      properties:
+        image: pyjail_image
+        name: pyjail
+        networks_advanced:
+          - name: dmznet
+            ipv4_address: 192.168.88.5
+        hostname: pyjail
+        capabilities:
+          add: ["NET_ADMIN"]
+
     dns:
       type: tf:terraform_host
       properties:
@@ -133,6 +173,7 @@ topology_template:
           external: 80
         capabilities:
             add: [NET_ADMIN]
+        dns: ["192.168.88.4"]
 
     client:
       type: tf:terraform_host

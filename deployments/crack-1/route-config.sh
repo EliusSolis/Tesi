@@ -13,12 +13,17 @@ docker exec suricata iptables -I FORWARD -s 192.168.88.0/21 -d 172.30.0.0/16 -j 
 docker exec suricata iptables -I FORWARD -s 172.30.0.0/16 -d 192.168.80.0/21 -j DROP
 
 
-# Da eseguire sugli host che devono comunicare con la rete interna
+# Host nella rete esterna
 #ip route add 192.168.80.0/20 via [indirizzo container suricata in sharednet]
 docker exec client ip route add 192.168.88.0/21 via 172.30.0.2
 docker exec client ip route add 192.168.80.0/20 via 172.30.0.2
 
-# Da eseguire sugli host che devono comunicare con la rete interna
-#ip route add 172.30.0.0/16 via [indirizzo container suricata in siemnet]
+# Host nella DMZ
 docker exec webserver ip route add 172.30.0.0/16 via 192.168.88.2
+docker exec webserver ip route add 192.168.80.0/21 via 192.168.88.2
 docker exec dns ip route add 172.30.0.0/16 via 192.168.88.2
+docker exec pyjail ip route add 172.30.0.0/16 via 192.168.88.2
+
+
+# Host nella rete interna
+docker exec postgres ip route add 192.168.88.0/21 via 192.168.80.8
