@@ -1,17 +1,28 @@
 <?php
-    $host        = "host = 192.168.80.9";
+    $host        = "host = postgres";
     $port        = "port = 5432";
     $dbname      = "dbname = webapp";
-    $credentials = "user = frontend";
+    $credentials = "user = frontend password = frontend";
 
     $db = pg_connect("$host $port $dbname $credentials");
     if(!$db) {
         echo "Error : Unable to open database\n";
     } else {
-        $sql = "SELECT * from product WHERE name = $_GET['product_name']";
-        $ret = pg_query($db, $sql)
+        $product_name = $_GET['product_name'];
+        $sql = "SELECT * from product WHERE name = '$product_name'";
+        $ret = pg_query($db, $sql);
         if ($ret) {
             echo "Query executed correctly";
+            $rows = pg_fetch_all($ret);
+            echo "<table>";
+            foreach ($rows as $row) {
+                echo "<tr>";
+                foreach ($row as $value) {
+                    echo "<td>$value</td>";
+                }
+                echo "</tr>";
+            }
+            echo "</table>";
         } else {
             echo "There was a problem with your query";
         }
