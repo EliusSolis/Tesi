@@ -302,7 +302,9 @@ topology_template:
           - volume_name: "suricata-log"
             container_path: "/var/log/suricata"
           - container_path: "/var/lib/suricata/rules/"
-            host_path: "/home/gz/repos/Tesi/deployments/crack-1/terraform-main/suricata_rules/"
+            host_path: "/home/gz/repos/Tesi/deployments/crack-1/terraform-main/suricata/suricata_rules/"
+          - container_path: "/etc/suricata/suricata.yaml"
+            host_path: "/home/gz/repos/Tesi/deployments/crack-1/terraform-main/suricata/suricata.yaml"
         command: ["/bin/bash", "-c", "service filebeat start && service suricata start && sleep 1h"]
 
     filebeat-es:
