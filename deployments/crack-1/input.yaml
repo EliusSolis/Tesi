@@ -10,6 +10,13 @@ topology_template:
 
 # ========== IMAGES ===============
 
+    plc1_image:
+      type: tf:terraform_image
+      properties:
+        name: gianzav/plc1
+        keep_locally: true
+
+
     postgres_image:
       type: tf:terraform_image
       properties:
@@ -101,7 +108,15 @@ topology_template:
       attributes:
         subnet: 192.168.88.0/21
         gateway: 192.168.88.1
-            
+
+    plc_network:
+      type: tf:terraform_network
+      properties:
+        name: plcnet
+        driver: bridge
+      attributes:
+        subnet: 192.168.120.0/21
+        gateway: 192.168.120.1
 
     external_network:
       type: tf:terraform_network
@@ -115,6 +130,37 @@ topology_template:
 
 
 # ========== HOSTS ===============
+
+    plc1:
+      type: tf:terraform_host
+      properties:
+        image: plc1_image
+        name: plc1
+        hostname: plc1
+        networks_advanced:
+          - name: plcnet
+            ipv4_address: 192.168.120.3
+        volumes:
+          - container_path : "/var/log/plc/"
+            volume_name: plc-logs
+        command: ["/bin/bash", "-c", "python plc1.py"]
+
+    filebeat_plc:
+      type: tf:terraform_host
+      properties:
+        image: filebeat_image
+        name: filebeat-plc
+        hostname: filebeat-plc
+        networks_advanced:
+          - name: plcnet
+            ipv4_address: 192.168.120.2
+        capabilities:
+          add: ["NET_ADMIN"]
+        volumes:
+          - container_path: "/var/log/plc/"
+            volume_name: plc-logs
+          - container_path: "/usr/share/filebeat/filebeat.yml"
+            host_path: "/home/gz/repos/Tesi/deployments/crack-1/terraform-main/filebeat-plc/filebeat.yml"
 
     database:
       type: tf:terraform_host
@@ -342,3 +388,8 @@ topology_template:
       type: tf:terraform_volume
       properties:
         name: es-data
+
+    plc-logs:
+      type: tf:terraform_volume
+      properties:
+        name: plc-logs
