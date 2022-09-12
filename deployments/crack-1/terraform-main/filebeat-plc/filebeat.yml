@@ -1,0 +1,13 @@
+setup.template.name: "plc"
+setup.template.pattern: "plc-*"
+
+
+filebeat.inputs:
+  - type: log
+    paths:
+      - "/var/log/plc/*"
+  json.key_under_root: true
+
+output.elasticsearch:
+  hosts: ["http://192.168.80.3:9200"]
+  index: "plc-%{[agent.version]}-%{+yyyy.MM.dd}"
