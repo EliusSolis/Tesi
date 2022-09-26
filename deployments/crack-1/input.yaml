@@ -139,21 +139,21 @@ topology_template:
         hostname: plc1
         networks_advanced:
           - name: plcnet
-            ipv4_address: 192.168.120.3
+            ipv4_address: 192.168.120.4
         volumes:
           - container_path : "/var/log/plc/"
             volume_name: plc-logs
-        command: ["/bin/bash", "-c", "python plc1.py"]
 
     filebeat_plc:
       type: tf:terraform_host
       properties:
         image: filebeat_image
         name: filebeat-plc
+        user: root
         hostname: filebeat-plc
         networks_advanced:
           - name: plcnet
-            ipv4_address: 192.168.120.2
+            ipv4_address: 192.168.120.3
         capabilities:
           add: ["NET_ADMIN"]
         volumes:
@@ -161,6 +161,7 @@ topology_template:
             volume_name: plc-logs
           - container_path: "/usr/share/filebeat/filebeat.yml"
             host_path: "/home/gz/repos/Tesi/deployments/crack-1/terraform-main/filebeat-plc/filebeat.yml"
+        command: ["/bin/bash", "-c", "yum install -y iproute && /usr/share/filebeat/filebeat -e"]
 
     database:
       type: tf:terraform_host
@@ -263,6 +264,8 @@ topology_template:
         volumes:
           - volume_name: es-data
             container_path: /usr/share/elasticsearch/data
+        capabilities:
+          add: ["NET_ADMIN"]
 
     logstash:
       type: tf:terraform_host
@@ -340,6 +343,8 @@ topology_template:
             ipv4_address: 192.168.88.2
           - name: extnet
             ipv4_address: 172.30.0.2
+          - name: plcnet
+            ipv4_address: 192.168.120.2 
         hostname: suricata
         capabilities:
           add:  ["NET_ADMIN", "SYS_ADMIN"]

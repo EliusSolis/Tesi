@@ -9,6 +9,10 @@ docker exec suricata sysctl -w net.ipv4.conf.eth0.route_localnet=1
 docker exec suricata iptables -I FORWARD -s 172.30.0.0/16 -d 192.168.88.0/21 -j ACCEPT
 # Traffico dalla dmz a quella esterna
 docker exec suricata iptables -I FORWARD -s 192.168.88.0/21 -d 172.30.0.0/16 -j ACCEPT
+# Traffico dalla rete dei plc a quella interna
+docker exec suricata iptables -I FORWARD -s 192.168.120.0/21 -d 192.168.80.0/21 -j ACCEPT
+# Traffico dalla rete interna a quella dei plc
+docker exec suricata iptables -I FORWARD -s 192.168.80.0/21 -d 192.168.120.0/21 -j ACCEPT
 # Blocca traffico da rete esterna a quella interna
 docker exec suricata iptables -I FORWARD -s 172.30.0.0/16 -d 192.168.80.0/21 -j DROP
 
@@ -27,7 +31,13 @@ docker exec client ip route add 192.168.88.0/21 via 172.30.0.2
 docker exec webserver ip route add 172.30.0.0/16 via 192.168.88.2
 docker exec webserver ip route add 192.168.80.0/21 via 192.168.88.2
 docker exec dns ip route add 172.30.0.0/16 via 192.168.88.2
-docker exec pyjail ip route add 172.30.0.0/16 via 192.168.88.2
+docker exec --user root pyjail /bin/bash -c "apt update && apt install -y iproute2 && ip route add 172.30.0.0/16 via 192.168.88.2"
+
 
 # Host nella rete interna
 docker exec postgres ip route add 192.168.88.0/21 via 192.168.80.8
+
+docker exec elasticsearch yum install -y iproute && docker exec elasticsearch ip route add 192.168.120.0/21 via 192.168.80.8
+
+# Host nella rete dei plc
+docker exec filebeat-plc ip route add 192.168.80.0/21 via 192.168.120.2
